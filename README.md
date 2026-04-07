@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AgentGrid
+
+A visual multi-agent AI orchestration platform. Spawn multiple AI agents, watch them think in real time, approve or deny tool use, and let them collaborate on file-based tasks.
+
+## Features
+
+- **Multi-agent control** — Run agents in parallel, each with their own task and log
+- **Human-in-the-loop approvals** — Review every tool call before it executes
+- **Workspace file tools** — Agents can create, read, edit, and search files in a sandboxed `workspace/` directory
+- **Agent-to-agent messaging** — Agents can delegate tasks to each other
+- **Session history & cost tracking** — Token counts and estimated costs per session (model-aware pricing)
+- **Multi-provider LLM support** — Works with OpenAI or any OpenAI-compatible provider (e.g. OpenRouter)
+- **Google OAuth + credentials auth** — Sign in with Google or register a local account
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure environment variables
+
+Create a `.env.local` file:
+
+```env
+# NextAuth
+AUTH_SECRET=your-secret-here   # generate with: openssl rand -base64 32
+
+# Google OAuth (optional — credentials login works without it)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+```
+
+### 3. Run the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Sign in (Google OAuth or register a local account at `/register`)
+2. Go to the Dashboard and click **+** in the sidebar to spawn an agent
+3. Enter a task and hit **Run**
+4. When an agent requests a tool, the approval drawer opens — review and approve or deny
+5. Watch results stream in real time in the agent log
 
-## Learn More
+## LLM Configuration
 
-To learn more about Next.js, take a look at the following resources:
+Click the settings icon in the sidebar to set your API key, provider base URL, and model. Keys are stored in `localStorage` only — never sent to the server.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## File Workspace
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Agent file operations are sandboxed to the `workspace/` directory at the project root. Files are visible in the Workspace panel on the right side of the dashboard. File size is capped at 1 MB for both reads and writes.
 
-## Deploy on Vercel
+## User Accounts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Local accounts are stored in `data/users.json` (created automatically). Passwords are hashed with bcrypt. Register at `/register`, sign in at `/login`.
