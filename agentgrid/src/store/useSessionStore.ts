@@ -18,6 +18,19 @@ interface SessionStore {
   addTokens: (count: number) => void;
   addMessage: (message: AgentMessage) => void;
   setHistoryOpen: (open: boolean) => void;
+  hydrateFromServer: () => Promise<void>;
+}
+
+function syncToServer(session: Session): void {
+  fetch('/api/sessions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(session),
+  }).catch(() => {});
+}
+
+function deleteFromServer(id: string): void {
+  fetch(`/api/sessions/${id}`, { method: 'DELETE' }).catch(() => {});
 }
 
 function createSessionRecord(name: string, agents: Agent[]): Session {
@@ -46,6 +59,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       saveSession(session);
       return { sessions, currentSessionId: session.id };
     });
+    syncToServer(session);
     return session.id;
   },
 
@@ -56,7 +70,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
         s.id === state.currentSessionId ? { ...s, ...updates } : s
       );
       const updated = sessions.find((s) => s.id === state.currentSessionId);
-      if (updated) saveSession(updated);
+      if (updated) { saveSession(updated); syncToServer(updated); }
       return { sessions };
     });
   },
@@ -70,6 +84,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
 
   deleteSession: (id) => {
     deleteSession(id);
+    deleteFromServer(id);
     set((state) => ({
       sessions: state.sessions.filter((s) => s.id !== id),
       currentSessionId: state.currentSessionId === id ? null : state.currentSessionId,
@@ -131,4 +146,20 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   },
 
   setHistoryOpen: (open) => set({ historyOpen: open }),
+
+  hydrateFromServer: async () => {
+    try {
+      const res = await fetch('/api/sessions');
+      if (!res.ok) return;
+      const { sessions: serverSessions } = await res.json() as { sessions: Session[] };
+      set((state) => {
+        const localIds = new Set(state.sessions.map((s) => s.id));
+        const newSessions = serverSessions.filter((s) => !localIds.has(s.id));
+        if (newSessions.length === 0) return state;
+        const merged = [...newSessions, ...state.sessions].slice(0, 50);
+        merged.forEach((s) => saveSession(s));
+        return { sessions: merged };
+      });
+    } catch {}
+  },
 }));

@@ -1,18 +1,21 @@
 'use client';
 
+import { useState } from 'react';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Bot, Settings, History, ChevronDown, ChevronRight, Trash2, Download, Upload, DollarSign, Zap, BookOpen, LogOut } from 'lucide-react';
+import { Plus, Bot, Settings, ChevronDown, ChevronRight, Trash2, Download, Upload, DollarSign, Zap, BookOpen, LogOut, Shield, Clock } from 'lucide-react';
 import { useAgentStore } from '@/store/useAgentStore';
 import { useSessionStore } from '@/store/useSessionStore';
 import { formatCost } from '@/lib/costTracker';
 import { signOut } from 'next-auth/react';
+import { ScheduledAgentsPanel } from '@/components/layout/ScheduledAgentsPanel';
 
 interface SidebarProps {
   onAddAgent: () => void;
   onOpenTutorial?: () => void;
+  onOpenAudit?: () => void;
 }
 
-export function Sidebar({ onAddAgent, onOpenTutorial }: SidebarProps) {
+export function Sidebar({ onAddAgent, onOpenTutorial, onOpenAudit }: SidebarProps) {
   const setSettingsOpen = useAgentStore((s) => s.setSettingsOpen);
   const llmConfig = useAgentStore((s) => s.llmConfig);
   const agents = useAgentStore((s) => s.agents);
@@ -23,6 +26,7 @@ export function Sidebar({ onAddAgent, onOpenTutorial }: SidebarProps) {
   const deleteSession = useSessionStore((s) => s.deleteSession);
   const exportSession = useSessionStore((s) => s.exportSession);
   const setHistoryOpen = useSessionStore((s) => s.setHistoryOpen);
+  const [scheduledOpen, setScheduledOpen] = useState(false);
 
   const activeAgentCount = agents.filter((a) => a.status !== 'idle' && a.status !== 'error').length;
 
@@ -148,10 +152,29 @@ export function Sidebar({ onAddAgent, onOpenTutorial }: SidebarProps) {
           )}
         </div>
 
+        {/* Scheduled section */}
+        <div>
+          <button
+            onClick={() => setScheduledOpen(!scheduledOpen)}
+            className="mb-1.5 flex w-full items-center justify-between px-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-600 hover:text-zinc-400 transition-colors"
+          >
+            <span>Scheduled</span>
+            {scheduledOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+          </button>
+          {scheduledOpen && <ScheduledAgentsPanel />}
+        </div>
+
         <div>
           <div className="mb-1.5 px-1">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">Help</span>
           </div>
+          <button
+            onClick={onOpenAudit}
+            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition-colors"
+          >
+            <Shield className="h-3.5 w-3.5" />
+            Audit Log
+          </button>
           <button
             onClick={onOpenTutorial}
             className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition-colors"

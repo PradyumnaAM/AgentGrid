@@ -83,6 +83,13 @@ export function ActionDrawer() {
                 {new Date(activeAction.timestamp).toLocaleTimeString()}
               </span>
             </div>
+            {activeAction.retryCount != null && activeAction.retryCount > 0 && (
+              <div className="flex items-center gap-3 border-t border-white/10 px-4 py-3">
+                <span className="rounded-md border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400">
+                  Retrying ({activeAction.retryCount}/3)…
+                </span>
+              </div>
+            )}
           </div>
 
           {toolInfo && (

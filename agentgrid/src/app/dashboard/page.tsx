@@ -6,7 +6,10 @@ import { Dashboard } from '@/components/layout/Dashboard';
 import { ActionDrawer } from '@/components/layout/ActionDrawer';
 import { ApiKeyManager } from '@/components/settings/ApiKeyManager';
 import { TutorialOverlay } from '@/components/layout/TutorialOverlay';
+import { AuditLogPanel } from '@/components/layout/AuditLogPanel';
 import { useAgentStore } from '@/store/useAgentStore';
+import { useSessionStore } from '@/store/useSessionStore';
+import { useResumeAgents } from '@/hooks/useResumeAgents';
 import { Bot, Key, X } from 'lucide-react';
 
 function AddAgentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (name: string, apiKeyId?: string) => void }) {
@@ -86,13 +89,17 @@ function AddAgentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (name: 
 }
 
 export default function DashboardPage() {
+  useResumeAgents();
   const agents = useAgentStore((s) => s.agents);
   const addAgent = useAgentStore((s) => s.addAgent);
+  const hydrateFromServer = useSessionStore((s) => s.hydrateFromServer);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [tutorialSessionId, setTutorialSessionId] = useState(0);
   const [addAgentOpen, setAddAgentOpen] = useState(false);
+  const [auditOpen, setAuditOpen] = useState(false);
 
   useEffect(() => {
+    hydrateFromServer();
     queueMicrotask(() => {
       try {
         if (!window.localStorage.getItem('agentgrid_tutorial_seen')) {
@@ -130,13 +137,14 @@ export default function DashboardPage() {
 
   return (
     <div className="flex h-screen bg-zinc-950 text-white">
-      <Sidebar onAddAgent={() => setAddAgentOpen(true)} onOpenTutorial={openTutorial} />
+      <Sidebar onAddAgent={() => setAddAgentOpen(true)} onOpenTutorial={openTutorial} onOpenAudit={() => setAuditOpen(true)} />
       <main className="flex flex-1 flex-col overflow-hidden">
         <Dashboard />
       </main>
       <ActionDrawer />
       <ApiKeyManager />
       <TutorialOverlay open={tutorialOpen} onClose={closeTutorial} sessionId={tutorialSessionId} />
+      <AuditLogPanel open={auditOpen} onClose={() => setAuditOpen(false)} />
       {addAgentOpen && (
         <AddAgentModal
           onClose={() => setAddAgentOpen(false)}

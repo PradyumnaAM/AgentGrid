@@ -106,6 +106,7 @@ interface AgentStore {
   updateApiKey: (entry: ApiKeyEntry) => void;
   removeApiKey: (id: string) => void;
   getLlmConfigForAgent: (agentId: string) => LlmConfig;
+  updateActionRetryCount: (actionId: string, count: number) => void;
 }
 
 export const useAgentStore = create<AgentStore>((set, get) => ({
@@ -163,6 +164,12 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
     set((state) => {
       const action = state.activeAction;
       if (!action || action.id !== actionId) return state;
+      const agent = state.agents.find((a) => a.id === action.agentId);
+      fetch('/api/audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agentId: action.agentId, agentName: agent?.name ?? action.agentId, tool: action.tool, action: 'approved', params: action.params }),
+      }).catch(() => {});
       return {
         activeAction: { ...action, status: 'approved' },
         agents: state.agents.map((a) =>
@@ -177,6 +184,12 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
     set((state) => {
       const action = state.activeAction;
       if (!action || action.id !== actionId) return state;
+      const agent = state.agents.find((a) => a.id === action.agentId);
+      fetch('/api/audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agentId: action.agentId, agentName: agent?.name ?? action.agentId, tool: action.tool, action: 'denied', params: action.params }),
+      }).catch(() => {});
       return {
         activeAction: { ...action, status: 'denied' },
         drawerOpen: false,
@@ -275,4 +288,12 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
     }
     return state.llmConfig;
   },
+
+  updateActionRetryCount: (actionId, count) =>
+    set((state) => ({
+      activeAction:
+        state.activeAction?.id === actionId
+          ? { ...state.activeAction, retryCount: count }
+          : state.activeAction,
+    })),
 }));

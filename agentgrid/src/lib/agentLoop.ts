@@ -2,6 +2,8 @@ import { streamLLM, buildTaskPrompt, buildContinuationPrompt } from '@/lib/llm';
 import { useAgentStore } from '@/store/useAgentStore';
 import { useSessionStore } from '@/store/useSessionStore';
 import { estimateTokens } from '@/lib/costTracker';
+import { saveCheckpoint, clearCheckpoint } from '@/lib/agentCheckpoint';
+import { withRetry } from '@/lib/retry';
 import type { ToolAction } from '@/lib/types';
 
 const TOOL_ENDPOINTS: Record<string, string> = {
@@ -38,6 +40,7 @@ export async function runAgentLoop({ agentId, task }: AgentLoopOptions): Promise
 
   while (iteration < maxIterations) {
     iteration++;
+    saveCheckpoint({ agentId, task, iteration, savedAt: Date.now() });
     let hasError = false;
     let streamedContent = '';
     const actionRef: { current: { tool: string; params: Record<string, unknown> } | null } = { current: null };
@@ -66,6 +69,12 @@ export async function runAgentLoop({ agentId, task }: AgentLoopOptions): Promise
         hasError = true;
         store.pushLog(agentId, `Error: ${error}`, 'error');
         store.updateAgentStatus(agentId, 'error');
+        clearCheckpoint(agentId);
+        fetch('/api/audit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ agentId, agentName: agent.name, tool: 'llm_stream', action: 'error', params: {}, result: String(error) }),
+        }).catch(() => {});
       },
     });
 
@@ -74,6 +83,7 @@ export async function runAgentLoop({ agentId, task }: AgentLoopOptions): Promise
     if (!actionRef.current) {
       store.pushLog(agentId, 'Task complete', 'system');
       store.updateAgentStatus(agentId, 'idle');
+      clearCheckpoint(agentId);
       return;
     }
 
@@ -129,6 +139,7 @@ export async function runAgentLoop({ agentId, task }: AgentLoopOptions): Promise
     if (!endpoint) {
       store.pushLog(agentId, `Unknown tool: ${toolName}`, 'error');
       store.updateAgentStatus(agentId, 'error');
+      clearCheckpoint(agentId);
       return;
     }
 
@@ -174,33 +185,44 @@ export async function runAgentLoop({ agentId, task }: AgentLoopOptions): Promise
       continue;
     }
 
+    let retryAttempt = 0;
     try {
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(toolParams),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        store.pushLog(agentId, `Tool error: ${data.error}`, 'error');
-        currentPrompt = buildContinuationPrompt(task, `Error: ${data.error}`, false);
-        store.completeAction(action.id, `Error: ${data.error}`);
-        continue;
-      }
+      const data = await withRetry(
+        async () => {
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(toolParams),
+          });
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.error ?? `HTTP ${res.status}`);
+          return json;
+        },
+        { maxAttempts: 3, baseDelayMs: 1000, multiplier: 2 },
+        (attempt, err) => {
+          retryAttempt = attempt;
+          useAgentStore.getState().updateActionRetryCount(action.id, attempt);
+          store.pushLog(agentId, `Retry ${attempt}/3 for ${toolName}: ${err instanceof Error ? err.message : err}`, 'system');
+        }
+      );
 
       store.pushLog(agentId, `Result: ${data.result}`, 'result');
       currentPrompt = buildContinuationPrompt(task, data.result, false);
       store.completeAction(action.id, data.result);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Tool execution failed';
-      store.pushLog(agentId, msg, 'error');
+      store.pushLog(agentId, `Failed after ${retryAttempt + 1} attempt(s): ${msg}`, 'error');
       currentPrompt = buildContinuationPrompt(task, msg, false);
       store.completeAction(action.id, `Error: ${msg}`);
+      fetch('/api/audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agentId, agentName: agent.name, tool: toolName, action: 'error', params: toolParams, result: msg }),
+      }).catch(() => {});
     }
   }
 
   store.pushLog(agentId, 'Max iterations reached', 'system');
   store.updateAgentStatus(agentId, 'idle');
+  clearCheckpoint(agentId);
 }

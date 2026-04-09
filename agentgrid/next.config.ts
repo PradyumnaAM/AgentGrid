@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    // @ts-expect-error - instrumentationHook exists at runtime but not in TS types
+    instrumentationHook: true,
+  },
 };
 
 export default nextConfig;

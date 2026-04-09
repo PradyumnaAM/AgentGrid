@@ -23,6 +23,20 @@ export interface ToolAction {
   status: ActionStatus;
   result?: string;
   timestamp: number;
+  retryCount?: number;
+}
+
+export type AuditAction = 'approved' | 'denied' | 'error';
+
+export interface AuditEntry {
+  id: string;
+  timestamp: number;
+  agentId: string;
+  agentName: string;
+  tool: string;
+  action: AuditAction;
+  params: Record<string, unknown>;
+  result?: string;
 }
 
 export type LogType = 'thought' | 'action' | 'result' | 'error' | 'system' | 'message';

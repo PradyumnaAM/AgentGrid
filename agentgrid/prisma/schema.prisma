@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  passwordHash String
+  sessions     Session[]
+  auditLogs    AuditLog[]
+  createdAt    DateTime   @default(now())
+}
+
+model Session {
+  id              String   @id
+  name            String
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  agentsJson      String
+  messagesJson    String
+  startTime       BigInt
+  endTime         BigInt?
+  status          String   @default("active")
+  estimatedTokens Int      @default(0)
+  estimatedCost   Float    @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  timestamp  DateTime @default(now())
+  agentId    String
+  agentName  String
+  tool       String
+  action     String
+  paramsJson String
+  result     String?
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model ScheduledAgent {
+  id             String   @id @default(cuid())
+  name           String
+  task           String
+  cronExpression String
+  enabled        Boolean  @default(true)
+  llmConfigJson  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
