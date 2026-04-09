@@ -34,7 +34,9 @@ export function ScheduledAgentsPanel() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     const key = apiKeys.find((k) => k.id === apiKeyId);
-    const llmConfigJson = JSON.stringify(key ? key.config : llmConfig);
+    const llmConfigJson = JSON.stringify(key
+      ? { provider: key.provider, apiKey: '', model: key.model, baseUrl: key.baseUrl, apiKeyId: key.id }
+      : llmConfig);
     await fetch('/api/scheduled-agents', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

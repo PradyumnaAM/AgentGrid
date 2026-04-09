@@ -64,7 +64,7 @@ function AddAgentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (name: 
               <option value="">Use global default</option>
               {apiKeys.map((k) => (
                 <option key={k.id} value={k.id}>
-                  {k.name} ({k.config.model})
+                  {k.name} ({k.model})
                 </option>
               ))}
             </select>

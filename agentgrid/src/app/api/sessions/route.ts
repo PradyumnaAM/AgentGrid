@@ -3,6 +3,7 @@ export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/apiAuth';
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 
 export async function GET() {
   const { user, error } = await requireAuth();
@@ -10,7 +11,7 @@ export async function GET() {
 
   try {
     const rows = await prisma.session.findMany({
-      where: { userId: user!.email },
+      where: { userId: user!.id },
       orderBy: { createdAt: 'desc' },
       take: 50,
     });
@@ -28,7 +29,8 @@ export async function GET() {
     }));
 
     return NextResponse.json({ sessions });
-  } catch {
+  } catch (err) {
+    log('error', 'Failed to fetch sessions', { err: String(err) });
     return NextResponse.json({ error: 'Failed to fetch sessions' }, { status: 500 });
   }
 }
@@ -46,7 +48,7 @@ export async function POST(req: NextRequest) {
       create: {
         id,
         name,
-        userId: user!.email,
+        userId: user!.id,
         agentsJson: JSON.stringify(agents ?? []),
         messagesJson: JSON.stringify(messages ?? []),
         startTime: BigInt(startTime ?? Date.now()),
@@ -67,7 +69,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (err) {
+    log('error', 'Failed to save session', { err: String(err) });
     return NextResponse.json({ error: 'Failed to save session' }, { status: 500 });
   }
 }

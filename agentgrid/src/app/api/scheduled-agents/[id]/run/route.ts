@@ -39,7 +39,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     const logs: string[] = [];
     let currentPrompt = `You are an autonomous AI agent. Complete this task: ${sa.task}\n\nYou can use tools by responding with a JSON code block:\n\`\`\`json\n{"tool": "tool_name", "params": {...}}\n\`\`\`\n\nAvailable tools: create_file, read_dir, read_file, search, edit_file.\nWhen done, respond with plain text only (no tool call).`;
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+    const baseUrl = process.env.NEXTAUTH_URL ?? 'http://localhost:3000';
 
     for (let i = 0; i < MAX_ITERATIONS; i++) {
       const streamRes = await fetch(`${baseUrl}/api/stream`, {

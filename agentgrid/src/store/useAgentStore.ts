@@ -10,12 +10,17 @@ export interface LlmConfig {
   apiKey: string;
   model: string;
   baseUrl?: string;
+  /** If set, the raw key is resolved server-side from the DB by the stream route */
+  apiKeyId?: string;
 }
 
+/** API key metadata returned from server — raw key is never stored client-side */
 export interface ApiKeyEntry {
   id: string;
   name: string;
-  config: LlmConfig;
+  provider: string;
+  model: string;
+  baseUrl?: string | null;
 }
 
 const DEFAULT_LLM_CONFIG: LlmConfig = {
@@ -30,28 +35,6 @@ function getStoredApiKey(): string | null {
   } catch {
     return null;
   }
-}
-
-function getStoredApiKeys(): ApiKeyEntry[] {
-  try {
-    const raw = localStorage.getItem('agentgrid_api_keys');
-    if (raw) return JSON.parse(raw) as ApiKeyEntry[];
-    // Migrate legacy single key into a pool entry
-    const legacy = localStorage.getItem('agentgrid_llm_config');
-    if (legacy) {
-      const cfg = JSON.parse(legacy) as Partial<LlmConfig>;
-      if (cfg.apiKey) {
-        return [{ id: 'default', name: 'Default', config: { provider: cfg.provider ?? 'openai', apiKey: cfg.apiKey, model: cfg.model ?? 'gpt-4o-mini', baseUrl: cfg.baseUrl } }];
-      }
-    }
-    return [];
-  } catch {
-    return [];
-  }
-}
-
-function saveApiKeys(keys: ApiKeyEntry[]) {
-  try { localStorage.setItem('agentgrid_api_keys', JSON.stringify(keys)); } catch {}
 }
 
 function getStoredLlmConfig(): LlmConfig {
@@ -102,9 +85,9 @@ interface AgentStore {
   clearApiKey: () => void;
   setSettingsOpen: (open: boolean) => void;
 
-  addApiKey: (entry: ApiKeyEntry) => void;
-  updateApiKey: (entry: ApiKeyEntry) => void;
-  removeApiKey: (id: string) => void;
+  loadApiKeys: () => Promise<void>;
+  addApiKey: (data: { name: string; provider: string; apiKey: string; model: string; baseUrl?: string }) => Promise<void>;
+  removeApiKey: (id: string) => Promise<void>;
   getLlmConfigForAgent: (agentId: string) => LlmConfig;
   updateActionRetryCount: (actionId: string, count: number) => void;
 }
@@ -115,7 +98,7 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
   activeAction: null,
   drawerOpen: false,
   llmConfig: getStoredLlmConfig(),
-  apiKeys: getStoredApiKeys(),
+  apiKeys: [],
   settingsOpen: false,
 
   addAgent: (agent) =>
@@ -261,22 +244,29 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
 
   setSettingsOpen: (open) => set({ settingsOpen: open }),
 
-  addApiKey: (entry) => {
-    const next = [...get().apiKeys, entry];
-    saveApiKeys(next);
-    set({ apiKeys: next });
+  loadApiKeys: async () => {
+    try {
+      const res = await fetch('/api/api-keys');
+      if (!res.ok) return;
+      const { keys } = await res.json() as { keys: ApiKeyEntry[] };
+      set({ apiKeys: keys });
+    } catch {}
   },
 
-  updateApiKey: (entry) => {
-    const next = get().apiKeys.map((k) => k.id === entry.id ? entry : k);
-    saveApiKeys(next);
-    set({ apiKeys: next });
+  addApiKey: async (data) => {
+    const res = await fetch('/api/api-keys', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to save API key');
+    const { key } = await res.json() as { key: ApiKeyEntry };
+    set((state) => ({ apiKeys: [key, ...state.apiKeys] }));
   },
 
-  removeApiKey: (id) => {
-    const next = get().apiKeys.filter((k) => k.id !== id);
-    saveApiKeys(next);
-    set({ apiKeys: next });
+  removeApiKey: async (id) => {
+    await fetch(`/api/api-keys/${id}`, { method: 'DELETE' });
+    set((state) => ({ apiKeys: state.apiKeys.filter((k) => k.id !== id) }));
   },
 
   getLlmConfigForAgent: (agentId) => {
@@ -284,7 +274,15 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
     const agent = state.agents.find((a) => a.id === agentId);
     if (agent?.apiKeyId) {
       const entry = state.apiKeys.find((k) => k.id === agent.apiKeyId);
-      if (entry) return entry.config;
+      if (entry) {
+        return {
+          provider: entry.provider as LlmProvider,
+          apiKey: '',
+          model: entry.model,
+          baseUrl: entry.baseUrl ?? undefined,
+          apiKeyId: entry.id,
+        };
+      }
     }
     return state.llmConfig;
   },

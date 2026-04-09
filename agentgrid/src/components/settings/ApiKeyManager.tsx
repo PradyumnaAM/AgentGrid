@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { useAgentStore, type ApiKeyEntry, type LlmConfig } from '@/store/useAgentStore';
+import { useAgentStore, type ApiKeyEntry } from '@/store/useAgentStore';
 import {
   Key, Eye, EyeOff, Trash2, CheckCircle, AlertCircle,
   Loader2, Sparkles, Plus, ChevronDown, ChevronUp, Star,
@@ -205,17 +205,13 @@ function KeyRow({
   onSetDefault: () => void;
   onDelete: () => void;
 }) {
-  const masked = entry.config.apiKey
-    ? `${entry.config.apiKey.slice(0, 6)}${'•'.repeat(12)}${entry.config.apiKey.slice(-4)}`
-    : '(no key)';
-
   return (
     <div className={`flex items-center gap-3 rounded-xl border p-3 transition ${isDefault ? 'border-violet-400/30 bg-violet-500/8' : 'border-white/10 bg-white/[0.02]'}`}>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex items-center gap-2">
           <span className="truncate text-sm font-medium text-zinc-100">{entry.name}</span>
-          <span className={`rounded-full border px-1.5 py-px text-[10px] ${entry.config.provider === 'openai' ? 'border-emerald-400/20 bg-emerald-500/10 text-emerald-300' : 'border-cyan-400/20 bg-cyan-500/10 text-cyan-300'}`}>
-            {entry.config.provider === 'openai' ? 'OpenAI' : 'Compatible'}
+          <span className={`rounded-full border px-1.5 py-px text-[10px] ${entry.provider === 'openai' ? 'border-emerald-400/20 bg-emerald-500/10 text-emerald-300' : 'border-cyan-400/20 bg-cyan-500/10 text-cyan-300'}`}>
+            {entry.provider === 'openai' ? 'OpenAI' : 'Compatible'}
           </span>
           {isDefault && (
             <span className="rounded-full border border-violet-400/30 bg-violet-500/15 px-1.5 py-px text-[10px] text-violet-300">
@@ -224,9 +220,9 @@ function KeyRow({
           )}
         </div>
         <div className="flex items-center gap-2 text-[11px] text-zinc-500">
-          <span className="font-mono">{masked}</span>
+          <span className="font-mono">••••••••••••••••••••</span>
           <span>·</span>
-          <span>{entry.config.model}</span>
+          <span>{entry.model}</span>
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-1">
@@ -255,37 +251,43 @@ export function ApiKeyManager() {
   const apiKeys = useAgentStore((s) => s.apiKeys);
   const addApiKey = useAgentStore((s) => s.addApiKey);
   const removeApiKey = useAgentStore((s) => s.removeApiKey);
+  const loadApiKeys = useAgentStore((s) => s.loadApiKeys);
 
   const [addingKey, setAddingKey] = useState(false);
+
+  useEffect(() => { loadApiKeys().catch(() => {}); }, [loadApiKeys]);
 
   // Close add-form when sheet closes
   useEffect(() => {
     if (!settingsOpen) setAddingKey(false);
   }, [settingsOpen]);
 
-  const handleAddKey = (form: KeyFormState) => {
-    const config: LlmConfig = {
-      provider: form.provider,
-      apiKey: form.apiKey.trim(),
-      model: form.model.trim(),
-      baseUrl: form.baseUrl.trim(),
-    };
-    addApiKey({ id: `key-${Date.now()}`, name: form.name.trim(), config });
-    setAddingKey(false);
-    // Auto-set as global default if no key configured yet
-    if (!llmConfig.apiKey) {
-      setLlmConfig(config);
+  const handleAddKey = async (form: KeyFormState) => {
+    try {
+      await addApiKey({
+        name: form.name.trim(),
+        provider: form.provider,
+        apiKey: form.apiKey.trim(),
+        model: form.model.trim(),
+        baseUrl: form.baseUrl.trim() || undefined,
+      });
+      setAddingKey(false);
+    } catch {
+      // error handled by store
     }
   };
 
   const handleSetDefault = (entry: ApiKeyEntry) => {
-    setLlmConfig(entry.config);
+    setLlmConfig({
+      provider: entry.provider as import('@/store/useAgentStore').LlmProvider,
+      apiKey: '',
+      model: entry.model,
+      baseUrl: entry.baseUrl ?? undefined,
+      apiKeyId: entry.id,
+    });
   };
 
-  const isDefaultKey = (entry: ApiKeyEntry) =>
-    entry.config.apiKey === llmConfig.apiKey &&
-    entry.config.provider === llmConfig.provider &&
-    entry.config.model === llmConfig.model;
+  const isDefaultKey = (entry: ApiKeyEntry) => llmConfig.apiKeyId === entry.id;
 
   return (
     <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
@@ -332,7 +334,7 @@ export function ApiKeyManager() {
                   entry={entry}
                   isDefault={isDefaultKey(entry)}
                   onSetDefault={() => handleSetDefault(entry)}
-                  onDelete={() => removeApiKey(entry.id)}
+                  onDelete={() => { removeApiKey(entry.id).catch(() => {}); }}
                 />
               ))}
             </div>
@@ -369,9 +371,9 @@ export function ApiKeyManager() {
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
             <h4 className="text-sm font-medium text-zinc-300">Security notes</h4>
             <ul className="mt-2 space-y-1 text-xs text-zinc-500">
-              <li>• Keys are stored only in your browser&apos;s localStorage</li>
-              <li>• Keys are sent directly to your chosen provider — never to AgentGrid servers</li>
-              <li>• Clear your browser data to remove all stored keys</li>
+              <li>• Keys are stored encrypted server-side — never in your browser</li>
+              <li>• The raw key is resolved only at request time, inside the server</li>
+              <li>• Delete a key here to permanently remove it from the database</li>
             </ul>
           </div>
         </div>

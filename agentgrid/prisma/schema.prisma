@@ -13,7 +13,20 @@ model User {
   passwordHash String
   sessions     Session[]
   auditLogs    AuditLog[]
+  apiKeys      ApiKey[]
   createdAt    DateTime   @default(now())
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  name      String
+  provider  String
+  apiKey    String
+  model     String
+  baseUrl   String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 model Session {

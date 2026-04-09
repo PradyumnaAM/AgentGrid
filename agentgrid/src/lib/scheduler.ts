@@ -1,5 +1,7 @@
-// NOTE: node-cron requires a persistent Node.js process.
-// Works for local dev and self-hosted. NOT suitable for serverless deployments (Vercel).
+// PRODUCTION NOTE: node-cron holds scheduled tasks in memory — tasks are lost on process restart.
+// For serverless deployments (Vercel, Netlify, AWS Lambda):
+//   Use a persistent queue: BullMQ + Redis, or a managed cron (Trigger.dev, Inngest, Quirrel).
+// For self-hosted with a long-running process (Railway, Render, Fly.io): works as-is.
 import cron, { type ScheduledTask } from 'node-cron';
 import { prisma } from '@/lib/prisma';
 
@@ -38,6 +40,6 @@ export function stopAgent(id: string): void {
 }
 
 async function triggerAgent(id: string): Promise<void> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = process.env.NEXTAUTH_URL ?? 'http://localhost:3000';
   await fetch(`${baseUrl}/api/scheduled-agents/${id}/run`, { method: 'POST' });
 }

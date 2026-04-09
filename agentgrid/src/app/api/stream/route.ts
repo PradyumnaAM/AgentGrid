@@ -1,4 +1,8 @@
-import { NextRequest } from 'next/server';
+export const runtime = 'nodejs';
+
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/apiAuth';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 // Parse OpenAI rate-limit duration strings like "6m0s", "30s", "1h2m3s" → future ms timestamp
 function parseDurationToResetAt(s: string | null): number | null {
@@ -16,11 +20,32 @@ function parseDurationToResetAt(s: string | null): number | null {
 }
 
 export async function POST(req: NextRequest) {
+  const { user, error } = await requireAuth();
+  if (error) return error;
+  if (!checkRateLimit(user.id)) {
+    return NextResponse.json({ error: 'Rate limit exceeded. Max 20 requests/minute.' }, { status: 429 });
+  }
+
   const { systemPrompt, prompt, llmConfig } = await req.json();
-  const apiKey = llmConfig?.apiKey as string | undefined;
-  const provider = (llmConfig?.provider as string | undefined) ?? 'openai';
-  const model = (llmConfig?.model as string | undefined) ?? 'gpt-4o-mini';
-  const baseUrl = (llmConfig?.baseUrl as string | undefined)?.trim();
+
+  // Resolve API key: accept either a direct apiKey string or an apiKeyId (stored server-side in DB)
+  let apiKey = llmConfig?.apiKey as string | undefined;
+  let provider = (llmConfig?.provider as string | undefined) ?? 'openai';
+  let model = (llmConfig?.model as string | undefined) ?? 'gpt-4o-mini';
+  let baseUrl = (llmConfig?.baseUrl as string | undefined)?.trim();
+
+  if (llmConfig?.apiKeyId) {
+    const baseAppUrl = process.env.NEXTAUTH_URL ?? 'http://localhost:3000';
+    const res = await fetch(`${baseAppUrl}/api/api-keys/${llmConfig.apiKeyId}/resolve`, {
+      headers: { Cookie: req.headers.get('cookie') ?? '' },
+    });
+    if (!res.ok) return new Response('Invalid API key ID', { status: 400 });
+    const resolved = await res.json() as { apiKey: string; provider: string; model: string; baseUrl?: string };
+    apiKey = resolved.apiKey;
+    provider = resolved.provider;
+    model = resolved.model;
+    baseUrl = resolved.baseUrl?.trim();
+  }
 
   if (!apiKey) {
     return new Response('Missing API key', { status: 400 });

@@ -3,6 +3,7 @@ export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/apiAuth';
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const { user, error } = await requireAuth();
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest) {
   try {
     const logs = await prisma.auditLog.findMany({
       where: {
-        userId: user!.email,
+        userId: user!.id,
         ...(agentId ? { agentId } : {}),
         ...(action ? { action } : {}),
       },
@@ -36,7 +37,8 @@ export async function GET(req: NextRequest) {
         result: l.result,
       })),
     });
-  } catch {
+  } catch (err) {
+    log('error', 'Failed to fetch audit logs', { err: String(err) });
     return NextResponse.json({ error: 'Failed to fetch audit logs' }, { status: 500 });
   }
 }

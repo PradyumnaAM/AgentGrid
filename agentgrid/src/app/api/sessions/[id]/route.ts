@@ -3,6 +3,7 @@ export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/apiAuth';
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { user, error } = await requireAuth();
@@ -17,7 +18,8 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
     await prisma.session.delete({ where: { id } });
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (err) {
+    log('error', 'Failed to delete session', { err: String(err) });
     return NextResponse.json({ error: 'Failed to delete session' }, { status: 500 });
   }
 }
