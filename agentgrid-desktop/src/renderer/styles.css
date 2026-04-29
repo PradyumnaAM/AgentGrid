@@ -127,7 +127,7 @@ button {
   overflow-y: hidden;
   -webkit-app-region: no-drag;
   scrollbar-width: thin;
-  border-bottom: var(--size-1) solid transparent;
+  border-bottom: var(--size-1) solid var(--color-transparent);
 }
 
 .tab-button {
@@ -137,7 +137,7 @@ button {
   height: calc(var(--pane-header-h) + var(--size-4));
   padding: 0 var(--size-10) 0 var(--size-12);
   margin-bottom: calc(var(--size-1) * -1);
-  border: var(--size-1) solid transparent;
+  border: var(--size-1) solid var(--color-transparent);
   border-bottom: none;
   border-radius: var(--radius-none);
   background: var(--vscode-tab-inactive);
@@ -268,7 +268,7 @@ button {
   height: var(--size-20);
   border: none;
   border-radius: var(--size-1);
-  background: transparent;
+  background: var(--color-transparent);
   color: var(--vscode-fg-muted);
   cursor: pointer;
   font-size: var(--type-caption-size);
@@ -405,9 +405,9 @@ button {
 }
 
 .pane-action {
-  border: var(--size-1) solid transparent;
+  border: var(--size-1) solid var(--color-transparent);
   border-radius: var(--size-2);
-  background: transparent;
+  background: var(--color-transparent);
   color: var(--vscode-fg-muted);
   cursor: pointer;
   padding: var(--size-1) var(--size-6);
@@ -443,7 +443,7 @@ button {
 }
 
 .terminal-host .xterm-viewport {
-  background-color: transparent !important;
+  background-color: var(--color-transparent) !important;
 }
 
 /* Separate install window (cliInstall) â€” keep minimal */
@@ -752,7 +752,7 @@ button {
   align-items: center;
   gap: var(--size-6);
   padding: var(--size-4) var(--size-12);
-  border: var(--size-1) solid transparent;
+  border: var(--size-1) solid var(--color-transparent);
   border-radius: var(--size-2);
   background: var(--color-accent);
   color: var(--color-white);
@@ -861,7 +861,7 @@ button {
 
 .pane-picker-launch {
   background: var(--color-accent);
-  border: var(--size-1) solid transparent;
+  border: var(--size-1) solid var(--color-transparent);
   color: var(--color-white);
   border-radius: var(--size-2);
   padding: var(--size-3) var(--size-10);
@@ -1065,7 +1065,7 @@ button {
   padding: var(--size-8) var(--size-12);
   border: var(--size-1) dashed var(--color-surface-tint-16);
   border-radius: var(--size-2);
-  background: transparent;
+  background: var(--color-transparent);
   color: var(--vscode-fg-muted);
   font-size: var(--type-body-size);
   cursor: pointer;
