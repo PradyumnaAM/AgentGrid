@@ -80,6 +80,11 @@ const CLI_AUTOCOMMAND: Record<PaneAssignment, string | null> = {
 };
 
 const AUTOCOMMAND_DELAY_MS = 350;
+const PANE_COUNT_MIN = 1;
+const PANE_COUNT_MAX = 6;
+const DEFAULT_TERMINAL_COLS = 80;
+const DEFAULT_TERMINAL_ROWS = 24;
+const TERMINAL_SCROLLBACK_LINES = 5000;
 
 function resolveContextForAssignment(_assignment: PaneAssignment): PaneLaunchContext {
   return 'native';
@@ -274,8 +279,8 @@ function createPaneState(index: number, layout: PaneLayoutMeta): TerminalPaneSta
     restartable: true,
     restartCount: 0,
     layout,
-    cols: 80,
-    rows: 24,
+    cols: DEFAULT_TERMINAL_COLS,
+    rows: DEFAULT_TERMINAL_ROWS,
     errorMessage: null,
   };
 }
@@ -509,7 +514,7 @@ class TerminalPaneController {
         selectionBackground: cssToken('--color-selection'),
       },
       allowProposedApi: true,
-      scrollback: 5000,
+      scrollback: TERMINAL_SCROLLBACK_LINES,
     });
 
     this.fitAddon = new FitAddon();
@@ -1422,7 +1427,7 @@ function updateHeaderStatus(): void {
 function renderPaneCountControls(ws: WorkspaceTab): void {
   paneCountEl!.replaceChildren();
   const current = ws.paneCount;
-  for (let count = 1; count <= 6; count++) {
+  for (let count = PANE_COUNT_MIN; count <= PANE_COUNT_MAX; count++) {
     const button = document.createElement('button');
     button.type = 'button';
     button.textContent = String(count);
@@ -1487,7 +1492,7 @@ projectFolderBrowseEl.addEventListener('click', () => {
 
 function renderLauncherPaneCount(): void {
   launcherPaneCountEl!.replaceChildren();
-  for (let count = 1; count <= 6; count++) {
+  for (let count = PANE_COUNT_MIN; count <= PANE_COUNT_MAX; count++) {
     const button = document.createElement('button');
     button.type = 'button';
     button.textContent = String(count);

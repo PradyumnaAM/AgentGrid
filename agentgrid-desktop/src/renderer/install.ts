@@ -11,6 +11,10 @@ const statusEl = document.getElementById('install-status') as HTMLElement | null
 if (!terminalHost) throw new Error('install-terminal missing');
 
 const POLL_MS = 400;
+const INSTALL_AUTOSTART_DELAY_MS = 300;
+const INSTALL_TERMINAL_FALLBACK_COLS = 100;
+const INSTALL_TERMINAL_FALLBACK_ROWS = 30;
+const TERMINAL_SCROLLBACK_LINES = 5000;
 
 function cssToken(name: string): string {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -30,7 +34,7 @@ const term = new Terminal({
   fontFamily: cssToken('--font-family-code'),
   fontSize: cssTokenNumber('--font-size-13'),
   lineHeight: cssTokenNumber('--line-height-ui'),
-  scrollback: 5000,
+  scrollback: TERMINAL_SCROLLBACK_LINES,
   theme: {
     background: cssToken('--color-terminal-bg'),
     foreground: cssToken('--color-terminal-fg'),
@@ -96,7 +100,7 @@ async function start(): Promise<void> {
   setTimeout(() => {
     if (!session || !ptyId) return;
     void window.agentgridPty.write(ptyId, `${buildInstallLine(session.command, session.markerPath)}\r`);
-  }, 300);
+  }, INSTALL_AUTOSTART_DELAY_MS);
 }
 
 async function pollMarker(): Promise<void> {
@@ -154,8 +158,8 @@ function safeSize(): { cols: number; rows: number } {
     // ignore
   }
   return {
-    cols: Math.max(1, term.cols || 100),
-    rows: Math.max(1, term.rows || 30),
+    cols: Math.max(1, term.cols || INSTALL_TERMINAL_FALLBACK_COLS),
+    rows: Math.max(1, term.rows || INSTALL_TERMINAL_FALLBACK_ROWS),
   };
 }
 
