@@ -972,7 +972,6 @@ button {
   font-size: var(--type-body-size);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: background 0.12s ease, border-color 0.12s ease;
 }
 
 .auth-btn-primary:hover {

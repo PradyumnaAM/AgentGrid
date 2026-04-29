@@ -134,23 +134,134 @@ const PANE_DISPOSE_TIMEOUT_MS = 1500;
 
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 const EASE_IN_OUT = [0.65, 0, 0.35, 1] as const;
+const PREMIUM_EASE = [0.25, 0.46, 0.45, 0.94] as const;
+const CONDITIONAL_EASE = [0.25, 0.46, 0.45, 0.94] as const;
+const ENTRANCE_DURATION_S = 0.7;
+const CONDITIONAL_ENTER_DURATION_S = 0.3;
+const CONDITIONAL_EXIT_DURATION_S = 0.2;
+const HOVER_TRANSFORM = 'translateY(-7px) scale(1.018)';
+const BUTTON_HOVER_TRANSFORM = 'scale(1.05)';
+const BUTTON_TAP_TRANSFORM = 'scale(0.97)';
+const MOTION_REST_TRANSFORM = 'translateY(0px) scale(1)';
+const FILTER_CLEAR = 'blur(0px)';
+const ENTRANCE_BLUR = 'blur(12px)';
+const CONDITIONAL_ENTER_BLUR = 'blur(8px)';
+const CONDITIONAL_EXIT_BLUR = 'blur(4px)';
+const MEDIA_ENTRANCE_BLUR = 'blur(10px)';
 
 function fadeIn(el: HTMLElement, opts?: { y?: number; duration?: number; delay?: number }): AnimationPlaybackControlsWithThen {
   const y = opts?.y ?? MOTION_Y_SM;
+  if (prefersReducedMotion()) {
+    return animate(el, { opacity: [0, 1] }, { duration: opts?.duration ?? ENTRANCE_DURATION_S, delay: opts?.delay ?? 0, ease: PREMIUM_EASE });
+  }
   return animate(
     el,
-    { opacity: [0, 1], transform: [translateY(y), translateYToken(MOTION_Y_ZERO)] },
-    { duration: opts?.duration ?? 0.32, delay: opts?.delay ?? 0, ease: EASE_OUT },
+    {
+      opacity: [0, 1],
+      filter: [ENTRANCE_BLUR, FILTER_CLEAR],
+      transform: [translateY(y), translateYToken(MOTION_Y_ZERO)],
+    },
+    { duration: opts?.duration ?? ENTRANCE_DURATION_S, delay: opts?.delay ?? 0, ease: PREMIUM_EASE },
   );
 }
 
 function fadeOut(el: HTMLElement, opts?: { y?: number; duration?: number }): AnimationPlaybackControlsWithThen {
   const y = opts?.y ?? -MOTION_Y_XS;
+  if (prefersReducedMotion()) {
+    return animate(el, { opacity: [1, 0] }, { duration: opts?.duration ?? CONDITIONAL_EXIT_DURATION_S, ease: EASE_IN_OUT });
+  }
   return animate(
     el,
-    { opacity: [1, 0], transform: [translateYToken(MOTION_Y_ZERO), translateY(y)] },
-    { duration: opts?.duration ?? 0.18, ease: EASE_IN_OUT },
+    {
+      opacity: [1, 0],
+      filter: [FILTER_CLEAR, CONDITIONAL_EXIT_BLUR],
+      transform: [translateYToken(MOTION_Y_ZERO), translateY(y)],
+    },
+    { duration: opts?.duration ?? CONDITIONAL_EXIT_DURATION_S, ease: EASE_IN_OUT },
   );
+}
+
+function prefersReducedMotion(): boolean {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function conditionalEnter(el: HTMLElement): AnimationPlaybackControlsWithThen {
+  if (prefersReducedMotion()) {
+    return animate(el, { opacity: [0, 1] }, { duration: CONDITIONAL_ENTER_DURATION_S, ease: CONDITIONAL_EASE });
+  }
+  return animate(
+    el,
+    {
+      opacity: [0, 1],
+      scale: [0.9, 1],
+      filter: [CONDITIONAL_ENTER_BLUR, FILTER_CLEAR],
+      transform: [translateY(MOTION_Y_XS), translateYToken(MOTION_Y_ZERO)],
+    },
+    { duration: CONDITIONAL_ENTER_DURATION_S, ease: CONDITIONAL_EASE },
+  );
+}
+
+function mediaEnter(el: HTMLElement, opts?: { delay?: number }): AnimationPlaybackControlsWithThen {
+  if (prefersReducedMotion()) {
+    return animate(el, { opacity: [0, 1] }, { duration: 0.65, delay: opts?.delay ?? 0, ease: EASE_OUT });
+  }
+  return animate(
+    el,
+    {
+      opacity: [0, 1],
+      scale: [0.92, 1],
+      filter: [MEDIA_ENTRANCE_BLUR, FILTER_CLEAR],
+    },
+    { duration: 0.65, delay: opts?.delay ?? 0, ease: [0.34, 1.56, 0.64, 1] },
+  );
+}
+
+function enableButtonMotion(el: HTMLElement, icon?: Element | null): void {
+  if (el.dataset.motionBound === 'true') return;
+  el.dataset.motionBound = 'true';
+  const reset = (): void => {
+    void animate(el, { transform: MOTION_REST_TRANSFORM }, { duration: 0.22, ease: EASE_OUT });
+    if (icon) void animate(icon, { transform: translateYToken(MOTION_Y_ZERO) }, { duration: 0.18, ease: EASE_OUT });
+  };
+  el.addEventListener('pointerenter', () => {
+    if (prefersReducedMotion()) return;
+    void animate(el, { transform: BUTTON_HOVER_TRANSFORM }, { duration: 0.2, ease: EASE_OUT });
+    if (icon) void animate(icon, { transform: 'translateX(3px)' }, { duration: 0.18, delay: 0.05, ease: EASE_OUT });
+  });
+  el.addEventListener('pointerleave', reset);
+  el.addEventListener('pointerdown', () => {
+    if (prefersReducedMotion()) return;
+    void animate(el, { transform: BUTTON_TAP_TRANSFORM }, { duration: 0.12, ease: EASE_OUT });
+  });
+  el.addEventListener('pointerup', reset);
+}
+
+function enableCardMotion(el: HTMLElement, icon?: Element | null): void {
+  if (el.dataset.motionBound === 'true') return;
+  el.dataset.motionBound = 'true';
+  el.addEventListener('pointerenter', () => {
+    if (prefersReducedMotion()) return;
+    void animate(el, { transform: HOVER_TRANSFORM }, { duration: 0.28, ease: EASE_OUT });
+    if (icon) void animate(icon, { transform: 'translateY(-3px)' }, { duration: 0.18, delay: 0.15, ease: EASE_OUT });
+  });
+  el.addEventListener('pointerleave', () => {
+    void animate(el, { transform: MOTION_REST_TRANSFORM }, { duration: 0.24, ease: EASE_OUT });
+    if (icon) void animate(icon, { transform: translateYToken(MOTION_Y_ZERO) }, { duration: 0.18, ease: EASE_OUT });
+  });
+}
+
+function bindStaticMotionControls(): void {
+  document.querySelectorAll<HTMLElement>(
+    '.account-button, .project-folder-button, .primary-button, .auth-btn-primary, .auth-btn-secondary, .auth-btn-ghost',
+  ).forEach((el) => enableButtonMotion(el, el.querySelector('svg, .primary-button-label')));
+
+  document.querySelectorAll<HTMLElement>('.launcher-panel, .project-folder-panel').forEach((el) => {
+    enableCardMotion(el, el.querySelector('svg'));
+  });
+
+  document.querySelectorAll<HTMLElement>('.app-logo, .home-hero-logo, .auth-logo, .auth-google-icon').forEach((el, index) => {
+    void mediaEnter(el, { delay: index * 0.05 });
+  });
 }
 
 // ─── Workspace state primitives (carried over, lightly tightened) ───────────
@@ -463,6 +574,7 @@ class TerminalPaneController {
     this.restartButton.type = 'button';
     this.restartButton.className = 'pane-action';
     this.restartButton.textContent = 'Restart';
+    enableButtonMotion(this.restartButton);
     this.restartButton.addEventListener('click', (event) => {
       event.stopPropagation();
       void this.restart();
@@ -472,6 +584,7 @@ class TerminalPaneController {
     this.killButton.type = 'button';
     this.killButton.className = 'pane-action';
     this.killButton.textContent = 'Kill';
+    enableButtonMotion(this.killButton);
     this.killButton.addEventListener('click', (event) => {
       event.stopPropagation();
       void this.kill();
@@ -483,6 +596,7 @@ class TerminalPaneController {
     this.closeButton.textContent = '\u00D7';
     this.closeButton.title = 'Close pane';
     this.closeButton.setAttribute('aria-label', 'Close pane');
+    enableButtonMotion(this.closeButton);
     this.closeButton.addEventListener('click', (event) => {
       event.stopPropagation();
       this.callbacks.onRequestClose(this.pane.id);
@@ -549,7 +663,7 @@ class TerminalPaneController {
     parent.append(this.root);
     // Tasteful entry animation — only the pane card, not its xterm canvas
     // (which gets its own opacity treatment via CSS to avoid flicker).
-    void fadeIn(this.root, { y: MOTION_Y_MD, duration: 0.28 });
+    void fadeIn(this.root, { y: MOTION_Y_MD, duration: ENTRANCE_DURATION_S });
     this.scheduleResize();
     if (this.pendingPick) {
       this.renderPicker();
@@ -620,7 +734,9 @@ class TerminalPaneController {
 
     this.root.append(overlay);
     this.pickerEl = overlay;
-    void fadeIn(overlay, { y: MOTION_Y_XS, duration: 0.22 });
+    enableCardMotion(overlay);
+    enableButtonMotion(launchBtn);
+    void conditionalEnter(overlay);
   }
 
   update(pane: TerminalPaneState): void {
@@ -1317,6 +1433,7 @@ class TabManager {
     btn.setAttribute('aria-selected', opts.isActive ? 'true' : 'false');
     btn.setAttribute('aria-controls', `panel-${opts.id}`);
     btn.addEventListener('click', opts.onClick);
+    enableButtonMotion(btn);
 
     if (opts.iconHTML) {
       const icon = document.createElement('span');
@@ -1348,6 +1465,7 @@ class TabManager {
       close.setAttribute('aria-label', 'Close tab');
       close.tabIndex = 0;
       close.textContent = '\u00D7';
+      enableButtonMotion(close);
       const handle = (event: Event): void => {
         event.stopPropagation();
         event.preventDefault();
@@ -1438,6 +1556,7 @@ function renderPaneCountControls(ws: WorkspaceTab): void {
       updateHeaderStatus();
       tabManager.refreshIndicators();
     });
+    enableButtonMotion(button);
     paneCountEl!.append(button);
   }
 }
@@ -1476,6 +1595,7 @@ function showProjectFolderNotice(message: string): void {
   const defaultText = 'Terminal panes will start from this folder when supported.';
   footnote.textContent = message;
   footnote.classList.add('transient');
+  if (footnote instanceof HTMLElement) void conditionalEnter(footnote);
   if (projectFolderNoticeTimer) window.clearTimeout(projectFolderNoticeTimer);
   projectFolderNoticeTimer = window.setTimeout(() => {
     footnote.textContent = defaultText;
@@ -1505,7 +1625,9 @@ function renderLauncherPaneCount(): void {
       renderLauncherPaneCount();
       renderLauncherAssignments();
     });
+    enableButtonMotion(button);
     launcherPaneCountEl!.append(button);
+    void fadeIn(button, { y: MOTION_Y_SM, duration: ENTRANCE_DURATION_S, delay: (count - PANE_COUNT_MIN) * 0.09 });
   }
 }
 
@@ -1514,6 +1636,7 @@ function renderLauncherAssignments(): void {
   for (let i = 0; i < launcherDraft.paneCount; i++) {
     const row = document.createElement('div');
     row.className = 'assignment-row';
+    enableCardMotion(row);
 
     const label = document.createElement('span');
     label.className = 'assignment-label';
@@ -1541,6 +1664,7 @@ function renderLauncherAssignments(): void {
 
     row.append(label, select, hint);
     launcherAssignmentsEl!.append(row);
+    void fadeIn(row, { y: MOTION_Y_SM, duration: ENTRANCE_DURATION_S, delay: i * 0.09 });
   }
 }
 
@@ -1552,12 +1676,14 @@ function renderOpenWorkspaces(): void {
     return;
   }
   openWorkspacesEl!.hidden = false;
+  void conditionalEnter(openWorkspacesEl!);
   openWorkspacesListEl!.replaceChildren();
-  for (const ws of tabs) {
+  for (const [index, ws] of tabs.entries()) {
     const card = document.createElement('button');
     card.type = 'button';
     card.className = 'open-workspace-card';
     card.addEventListener('click', () => tabManager.switchTo(ws.id));
+    enableCardMotion(card);
 
     const titleEl = document.createElement('span');
     titleEl.className = 'open-workspace-title';
@@ -1576,6 +1702,7 @@ function renderOpenWorkspaces(): void {
     close.className = 'open-workspace-close';
     close.textContent = '\u00D7';
     close.title = 'Close workspace';
+    enableButtonMotion(close);
     close.addEventListener('click', (e) => {
       e.stopPropagation();
       void tabManager.closeTab(ws.id);
@@ -1583,6 +1710,7 @@ function renderOpenWorkspaces(): void {
     card.append(close);
 
     openWorkspacesListEl!.append(card);
+    void fadeIn(card, { y: MOTION_Y_SM, duration: ENTRANCE_DURATION_S, delay: index * 0.09 });
   }
 }
 
@@ -1610,11 +1738,7 @@ function authLocalGatePassed(): boolean {
 function runHomeChromeEntranceAnimations(): void {
   const header = document.querySelector('.app-header');
   if (header instanceof HTMLElement) {
-    void animate(
-      header,
-      { opacity: [0, 1], transform: [translateY(-MOTION_Y_XS), translateYToken(MOTION_Y_ZERO)] },
-      { duration: 0.22, ease: EASE_OUT },
-    );
+    void fadeIn(header, { y: -MOTION_Y_XS, duration: ENTRANCE_DURATION_S });
   }
   void fadeIn(homePanelEl!, { y: MOTION_Y_MD, duration: 0.28, delay: 0.05 });
   const hero = document.querySelector('.home-hero');
@@ -1740,6 +1864,7 @@ function initAuthGate(): void {
 // ─── Bootstrap ──────────────────────────────────────────────────────────────
 
 initAuthGate();
+bindStaticMotionControls();
 
 const homeTab: HomeTab = {
   id: 'home',
