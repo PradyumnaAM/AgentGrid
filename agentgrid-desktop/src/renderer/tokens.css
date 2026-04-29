@@ -167,6 +167,7 @@
   --size-34: 34px;
   --size-36: 36px;
   --size-40: 40px;
+  --size-44: 44px;
   --size-48: 48px;
   --size-64: 64px;
   --size-120: 120px;
@@ -196,6 +197,7 @@
   --space-24: var(--size-24);
   --space-28: var(--size-28);
   --space-34: var(--size-34);
+  --space-44: var(--size-44);
   --space-48: var(--size-48);
   --space-64: var(--size-64);
 

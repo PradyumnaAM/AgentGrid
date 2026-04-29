@@ -1083,6 +1083,119 @@ button {
   opacity: 0.9;
 }
 
+@media (max-width: 768px) {
+  .app-header {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-8);
+  }
+
+  .app-brand {
+    min-height: var(--size-28);
+    border-right: none;
+  }
+
+  .app-tabs {
+    order: 3;
+    flex-basis: 100%;
+    padding: 0;
+  }
+
+  .tab-button {
+    min-height: var(--size-44);
+    max-width: var(--size-180);
+  }
+
+  .header-actions {
+    margin-left: auto;
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .app-subtitle {
+    display: none;
+  }
+
+  .account-button,
+  .pane-count button,
+  .project-folder-button,
+  .pane-count-selector button,
+  .primary-button,
+  .open-workspace-card,
+  .pane-picker-launch,
+  .auth-btn-primary,
+  .auth-btn-secondary,
+  .auth-btn-ghost {
+    min-height: var(--size-44);
+  }
+
+  .home-panel {
+    padding: var(--space-12);
+  }
+
+  .home-inner {
+    max-width: none;
+  }
+
+  .project-folder-main,
+  .launcher-actions,
+  .pane-picker-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .project-folder-button,
+  .primary-button,
+  .pane-picker-launch {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .assignment-row {
+    grid-template-columns: var(--size-18) minmax(0, 1fr);
+  }
+
+  .assignment-row .assignment-status {
+    grid-column: 2;
+  }
+
+  .auth-overlay {
+    padding: var(--space-16);
+  }
+
+  .auth-overlay-inner {
+    padding: var(--space-20);
+  }
+}
+
+@media (max-width: 420px) {
+  .app-brand-name {
+    display: none;
+  }
+
+  .account-button {
+    max-width: var(--size-120);
+  }
+
+  .home-hero-brand {
+    gap: var(--space-8);
+  }
+
+  .home-hero-name {
+    font-size: var(--type-h1-size);
+  }
+
+  .launcher-panel,
+  .project-folder-panel {
+    padding: var(--space-10);
+  }
+
+  .auth-brand {
+    flex-direction: column;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
