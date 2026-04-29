@@ -23,7 +23,7 @@
             </p>
           </div>
         </div>
-        <button type="button" id="auth-google-btn" class="auth-btn-primary">
+        <button type="button" id="auth-google-btn" class="auth-btn-primary" aria-label="Continue with Google in browser">
           <svg class="auth-google-icon" viewBox="0 0 24 24" aria-hidden="true" width="16" height="16">
             <path
               fill="var(--color-google-blue)"
@@ -45,12 +45,12 @@
         <div class="auth-or"><span>or email</span></div>
 
         <form id="auth-email-form" class="auth-email-form">
-          <button type="submit" class="auth-btn-secondary">Continue with email/password (browser)</button>
+          <button type="submit" class="auth-btn-secondary" aria-label="Continue with email or password in browser">Continue with email/password (browser)</button>
         </form>
 
         <div id="auth-status" class="auth-status" role="status" hidden></div>
 
-        <button type="button" id="auth-continue-local-btn" class="auth-btn-ghost">
+        <button type="button" id="auth-continue-local-btn" class="auth-btn-ghost" aria-label="Continue locally without cloud sign-in">
           Continue locally (no cloud sign-in)
         </button>
         <p class="auth-hint">

@@ -58,6 +58,14 @@ const authGoogleBtn = document.getElementById('auth-google-btn') as HTMLButtonEl
 const authEmailForm = document.getElementById('auth-email-form') as HTMLFormElement | null;
 const authStatusEl = document.getElementById('auth-status') as HTMLElement | null;
 const authContinueLocalBtn = document.getElementById('auth-continue-local-btn') as HTMLButtonElement | null;
+const AUTH_FOCUSABLE_SELECTOR = [
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  'a[href]',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
 
 if (!mainAppEl) throw new Error('main-app element missing');
 
@@ -262,6 +270,29 @@ function bindStaticMotionControls(): void {
   document.querySelectorAll<HTMLElement>('.app-logo, .home-hero-logo, .auth-logo, .auth-google-icon').forEach((el, index) => {
     void mediaEnter(el, { delay: index * 0.05 });
   });
+}
+
+function firstFocusableIn(container: HTMLElement): HTMLElement | null {
+  const found = Array.from(container.querySelectorAll<HTMLElement>(AUTH_FOCUSABLE_SELECTOR));
+  return found.find((el) => !el.hasAttribute('hidden') && el.offsetParent !== null) ?? null;
+}
+
+function trapFocusInAuthOverlay(event: KeyboardEvent): void {
+  if (event.key !== 'Tab' || !authOverlayEl || authOverlayEl.hidden) return;
+  const focusable = Array.from(authOverlayEl.querySelectorAll<HTMLElement>(AUTH_FOCUSABLE_SELECTOR)).filter(
+    (el) => !el.hasAttribute('hidden') && el.offsetParent !== null,
+  );
+  if (focusable.length === 0) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  const active = document.activeElement;
+  if (event.shiftKey && active === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && active === last) {
+    event.preventDefault();
+    first.focus();
+  }
 }
 
 // ─── Workspace state primitives (carried over, lightly tightened) ───────────
@@ -1549,6 +1580,7 @@ function renderPaneCountControls(ws: WorkspaceTab): void {
     const button = document.createElement('button');
     button.type = 'button';
     button.textContent = String(count);
+    button.setAttribute('aria-label', `${count} pane${count === 1 ? '' : 's'}`);
     button.className = count === current ? 'active' : '';
     button.title = `${count} pane${count === 1 ? '' : 's'}`;
     button.addEventListener('click', () => {
@@ -1618,6 +1650,7 @@ function renderLauncherPaneCount(): void {
     button.textContent = String(count);
     button.setAttribute('role', 'radio');
     button.setAttribute('aria-checked', count === launcherDraft.paneCount ? 'true' : 'false');
+    button.setAttribute('aria-label', `Launch ${count} pane${count === 1 ? '' : 's'}`);
     button.className = count === launcherDraft.paneCount ? 'active' : '';
     button.addEventListener('click', () => {
       launcherDraft.paneCount = count as PaneCount;
@@ -1702,10 +1735,18 @@ function renderOpenWorkspaces(): void {
     close.className = 'open-workspace-close';
     close.textContent = '\u00D7';
     close.title = 'Close workspace';
+    close.setAttribute('role', 'button');
+    close.setAttribute('aria-label', `Close ${ws.title}`);
+    close.tabIndex = 0;
     enableButtonMotion(close);
-    close.addEventListener('click', (e) => {
+    const closeWorkspace = (e: Event): void => {
       e.stopPropagation();
+      e.preventDefault();
       void tabManager.closeTab(ws.id);
+    };
+    close.addEventListener('click', closeWorkspace);
+    close.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') closeWorkspace(e);
     });
     card.append(close);
 
@@ -1754,6 +1795,13 @@ function runHomeChromeEntranceAnimations(): void {
 function setAuthLayer(showMainChrome: boolean): void {
   mainAppEl.hidden = !showMainChrome;
   if (authOverlayEl) authOverlayEl.hidden = showMainChrome;
+  window.setTimeout(() => {
+    if (showMainChrome) {
+      accountButtonEl?.focus();
+      return;
+    }
+    if (authOverlayEl) firstFocusableIn(authOverlayEl)?.focus();
+  }, 0);
 }
 
 function renderAuthStatus(status: AuthStatus): void {
@@ -1817,6 +1865,7 @@ function initAuthGate(): void {
     return;
   }
   setAuthLayer(false);
+  authOverlayEl.addEventListener('keydown', trapFocusInAuthOverlay);
 
   authGoogleBtn?.addEventListener('click', startDesktopAuth);
 
