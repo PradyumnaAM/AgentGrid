@@ -52,7 +52,7 @@ button {
   align-items: stretch;
   gap: 0;
   min-height: calc(var(--pane-header-h) + var(--size-11));
-  padding: 0 var(--size-8) 0 var(--size-10);
+  padding: 0 var(--space-8) 0 var(--space-10);
   border-bottom: var(--size-1) solid var(--vscode-border);
   background: var(--vscode-side);
   user-select: none;
@@ -62,9 +62,9 @@ button {
 .app-brand {
   display: flex;
   align-items: center;
-  gap: var(--size-7);
+  gap: var(--space-7);
   flex: 0 0 auto;
-  padding-right: var(--size-10);
+  padding-right: var(--space-10);
   border-right: var(--size-1) solid var(--vscode-border);
 }
 
@@ -91,9 +91,9 @@ button {
 .account-button {
   height: var(--size-25);
   max-width: var(--size-180);
-  padding: 0 var(--size-9);
+  padding: 0 var(--space-9);
   border: var(--size-1) solid var(--vscode-border);
-  border-radius: var(--size-3);
+  border-radius: var(--radius-3);
   background: var(--color-surface-tint-03);
   color: var(--vscode-fg);
   cursor: default;
@@ -122,7 +122,7 @@ button {
   display: flex;
   align-items: flex-end;
   gap: 0;
-  padding: 0 var(--size-4);
+  padding: 0 var(--space-4);
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-app-region: no-drag;
@@ -133,10 +133,10 @@ button {
 .tab-button {
   display: inline-flex;
   align-items: center;
-  gap: var(--size-6);
+  gap: var(--space-6);
   height: calc(var(--pane-header-h) + var(--size-4));
-  padding: 0 var(--size-10) 0 var(--size-12);
-  margin-bottom: calc(var(--size-1) * -1);
+  padding: 0 var(--space-10) 0 var(--space-12);
+  margin-bottom: calc(var(--space-1) * -1);
   border: var(--size-1) solid var(--color-transparent);
   border-bottom: none;
   border-radius: var(--radius-none);
@@ -190,10 +190,10 @@ button {
   justify-content: center;
   min-width: var(--size-20);
   height: var(--size-16);
-  padding: 0 var(--size-4);
+  padding: 0 var(--space-4);
   font-size: var(--type-micro-size);
   font-weight: var(--font-weight-medium);
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   background: var(--color-surface-tint-06);
   color: var(--vscode-fg-muted);
   font-variant-numeric: tabular-nums;
@@ -218,9 +218,9 @@ button {
   justify-content: center;
   width: var(--size-18);
   height: var(--size-18);
-  margin-left: var(--size-2);
-  margin-right: calc(var(--size-4) * -1);
-  border-radius: var(--size-2);
+  margin-left: var(--space-2);
+  margin-right: calc(var(--space-4) * -1);
+  border-radius: var(--radius-2);
   color: var(--vscode-fg-muted);
   font-size: var(--font-size-14);
   line-height: var(--line-height-tight);
@@ -235,10 +235,10 @@ button {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: var(--size-8);
+  gap: var(--space-8);
   flex: 0 0 auto;
   -webkit-app-region: no-drag;
-  padding-left: var(--size-8);
+  padding-left: var(--space-8);
   border-left: var(--size-1) solid var(--vscode-border);
 }
 
@@ -256,10 +256,10 @@ button {
 .pane-count {
   display: flex;
   align-items: center;
-  gap: var(--size-1);
-  padding: var(--size-1);
+  gap: var(--space-1);
+  padding: var(--space-1);
   border: var(--size-1) solid var(--vscode-border);
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   background: var(--color-overlay-20);
 }
 
@@ -267,7 +267,7 @@ button {
   width: var(--size-22);
   height: var(--size-20);
   border: none;
-  border-radius: var(--size-1);
+  border-radius: var(--radius-1);
   background: var(--color-transparent);
   color: var(--vscode-fg-muted);
   cursor: pointer;
@@ -319,7 +319,7 @@ button {
   display: grid;
   flex: 1 1 auto;
   min-height: 0;
-  gap: var(--size-1);
+  gap: var(--space-1);
   padding: 0;
   background: var(--color-bg);
 }
@@ -359,10 +359,10 @@ button {
 .pane-toolbar {
   display: flex;
   align-items: center;
-  gap: var(--size-8);
+  gap: var(--space-8);
   min-height: var(--pane-header-h);
   height: var(--pane-header-h);
-  padding: 0 var(--size-6) 0 var(--size-8);
+  padding: 0 var(--space-6) 0 var(--space-8);
   border-bottom: var(--size-1) solid var(--vscode-border);
   background: var(--color-panel-raised);
   user-select: none;
@@ -406,11 +406,11 @@ button {
 
 .pane-action {
   border: var(--size-1) solid var(--color-transparent);
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   background: var(--color-transparent);
   color: var(--vscode-fg-muted);
   cursor: pointer;
-  padding: var(--size-1) var(--size-6);
+  padding: var(--space-1) var(--space-6);
   font-size: var(--type-caption-size);
   line-height: var(--line-height-ui);
 }
@@ -421,7 +421,7 @@ button {
 }
 
 .pane-close {
-  padding: var(--size-1) var(--size-5);
+  padding: var(--space-1) var(--space-5);
   font-size: var(--font-size-13);
   line-height: var(--line-height-tight);
 }
@@ -434,7 +434,7 @@ button {
 .terminal-host {
   flex: 1 1 auto;
   min-height: 0;
-  padding: var(--size-2);
+  padding: var(--space-2);
   background: var(--vscode-bg);
 }
 
@@ -455,7 +455,7 @@ button {
 .install-terminal {
   height: calc(100vh - var(--size-48));
   min-height: 0;
-  padding: var(--size-8);
+  padding: var(--space-8);
   box-sizing: border-box;
   background: var(--vscode-bg);
 }
@@ -468,7 +468,7 @@ button {
 
 .home-panel {
   overflow: auto;
-  padding: var(--size-12) var(--size-16) var(--size-24);
+  padding: var(--space-12) var(--space-16) var(--space-24);
 }
 
 .home-inner {
@@ -477,22 +477,22 @@ button {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: var(--size-16);
+  gap: var(--space-16);
 }
 
 .home-hero {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--size-8);
-  padding-top: var(--size-4);
+  gap: var(--space-8);
+  padding-top: var(--space-4);
   opacity: 0;
 }
 
 .home-hero-brand {
   display: inline-flex;
   align-items: center;
-  gap: var(--size-10);
+  gap: var(--space-10);
 }
 
 .home-hero-logo {
@@ -524,15 +524,15 @@ button {
 
 .launcher-panel {
   border: var(--size-1) solid var(--vscode-border);
-  border-radius: var(--size-2);
-  padding: var(--size-12);
+  border-radius: var(--radius-2);
+  padding: var(--space-12);
   background: var(--color-panel-raised);
   opacity: 0;
 }
 
 .launcher-panel-header {
-  margin-bottom: var(--size-12);
-  padding-bottom: var(--size-8);
+  margin-bottom: var(--space-12);
+  padding-bottom: var(--space-8);
   border-bottom: var(--size-1) solid var(--vscode-border);
 }
 
@@ -543,7 +543,7 @@ button {
   letter-spacing: var(--letter-spacing-label);
   text-transform: uppercase;
   color: var(--vscode-fg-muted);
-  margin-bottom: var(--size-4);
+  margin-bottom: var(--space-4);
 }
 
 .launcher-panel-intro {
@@ -556,8 +556,8 @@ button {
 .launcher-section {
   display: flex;
   flex-direction: column;
-  gap: var(--size-6);
-  margin-bottom: var(--size-12);
+  gap: var(--space-6);
+  margin-bottom: var(--space-12);
 }
 
 .launcher-label {
@@ -571,17 +571,17 @@ button {
 .project-folder-panel {
   display: flex;
   flex-direction: column;
-  gap: var(--size-6);
-  padding: var(--size-8) var(--size-10);
+  gap: var(--space-6);
+  padding: var(--space-8) var(--space-10);
   border: var(--size-1) solid var(--vscode-border);
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   background: var(--color-overlay-20);
 }
 
 .project-folder-main {
   display: flex;
   align-items: center;
-  gap: var(--size-8);
+  gap: var(--space-8);
   min-width: 0;
 }
 
@@ -593,7 +593,7 @@ button {
   height: var(--size-26);
   flex: 0 0 auto;
   border: var(--size-1) solid var(--vscode-border);
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   color: var(--vscode-fg-muted);
 }
 
@@ -605,7 +605,7 @@ button {
 .project-folder-text {
   display: flex;
   flex-direction: column;
-  gap: var(--size-1);
+  gap: var(--space-1);
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -633,9 +633,9 @@ button {
 
 .project-folder-button {
   flex: 0 0 auto;
-  padding: var(--size-3) var(--size-8);
+  padding: var(--space-3) var(--space-8);
   border: var(--size-1) solid var(--vscode-border);
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   background: var(--color-surface-tint-04);
   color: var(--vscode-fg);
   font-size: var(--type-caption-size);
@@ -649,7 +649,7 @@ button {
 .project-folder-footnote {
   font-size: var(--type-micro-size);
   color: var(--vscode-fg-muted);
-  padding-left: var(--size-34);
+  padding-left: var(--space-34);
 }
 
 .project-folder-footnote.transient {
@@ -658,13 +658,13 @@ button {
 
 .pane-count-selector {
   display: flex;
-  gap: var(--size-4);
+  gap: var(--space-4);
   flex-wrap: wrap;
 }
 
 .pane-count-selector button {
   border: var(--size-1) solid var(--vscode-border);
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   background: var(--color-overlay-15);
   color: var(--vscode-fg);
   cursor: pointer;
@@ -686,17 +686,17 @@ button {
 .pane-assignments {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--size-4);
+  gap: var(--space-4);
 }
 
 .assignment-row {
   display: grid;
   grid-template-columns: var(--size-18) 1fr minmax(var(--size-120), 1fr);
   align-items: center;
-  gap: var(--size-8);
-  padding: var(--size-4) var(--size-8);
+  gap: var(--space-8);
+  padding: var(--space-4) var(--space-8);
   border: var(--size-1) solid var(--vscode-border);
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   background: var(--color-overlay-12);
 }
 
@@ -710,9 +710,9 @@ button {
 
 .assignment-row select {
   min-width: 0;
-  padding: var(--size-3) var(--size-6);
+  padding: var(--space-3) var(--space-6);
   border: var(--size-1) solid var(--vscode-border);
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   background: var(--color-panel-hover);
   color: var(--vscode-fg);
   font-size: var(--type-body-size);
@@ -737,9 +737,9 @@ button {
 .launcher-actions {
   display: flex;
   align-items: center;
-  gap: var(--size-12);
+  gap: var(--space-12);
   flex-wrap: wrap;
-  padding-top: var(--size-4);
+  padding-top: var(--space-4);
 }
 
 .launcher-actions-hint {
@@ -750,10 +750,10 @@ button {
 .primary-button {
   display: inline-flex;
   align-items: center;
-  gap: var(--size-6);
-  padding: var(--size-4) var(--size-12);
+  gap: var(--space-6);
+  padding: var(--space-4) var(--space-12);
   border: var(--size-1) solid var(--color-transparent);
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   background: var(--color-accent);
   color: var(--color-white);
   font-size: var(--type-body-size);
@@ -778,16 +778,16 @@ button {
 .open-workspaces-list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--size-6);
+  gap: var(--space-6);
 }
 
 .open-workspace-card {
   display: inline-flex;
   align-items: center;
-  gap: var(--size-8);
-  padding: var(--size-4) var(--size-8);
+  gap: var(--space-8);
+  padding: var(--space-4) var(--space-8);
   border: var(--size-1) solid var(--vscode-border);
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   background: var(--color-overlay-20);
   color: var(--vscode-fg);
   cursor: pointer;
@@ -813,9 +813,9 @@ button {
 }
 
 .open-workspace-close {
-  margin-left: var(--size-4);
-  padding: 0 var(--size-4);
-  border-radius: var(--size-2);
+  margin-left: var(--space-4);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-2);
   color: var(--vscode-fg-muted);
 }
 
@@ -834,8 +834,8 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--size-10);
-  padding: var(--size-16);
+  gap: var(--space-10);
+  padding: var(--space-16);
   z-index: var(--z-floating);
 }
 
@@ -847,15 +847,15 @@ button {
 .pane-picker-row {
   display: flex;
   align-items: center;
-  gap: var(--size-6);
+  gap: var(--space-6);
 }
 
 .pane-picker-select {
   background: var(--color-panel-hover);
   color: var(--vscode-fg);
   border: var(--size-1) solid var(--vscode-border);
-  border-radius: var(--size-2);
-  padding: var(--size-3) var(--size-6);
+  border-radius: var(--radius-2);
+  padding: var(--space-3) var(--space-6);
   font-size: var(--type-body-size);
 }
 
@@ -863,8 +863,8 @@ button {
   background: var(--color-accent);
   border: var(--size-1) solid var(--color-transparent);
   color: var(--color-white);
-  border-radius: var(--size-2);
-  padding: var(--size-3) var(--size-10);
+  border-radius: var(--radius-2);
+  padding: var(--space-3) var(--space-10);
   font-size: var(--type-body-size);
   cursor: pointer;
 }
@@ -882,7 +882,7 @@ button {
   border-bottom: var(--size-1) solid var(--color-danger-border);
   color: var(--color-danger);
   font-size: var(--type-caption-size);
-  padding: var(--size-4) var(--size-8);
+  padding: var(--space-4) var(--space-8);
 }
 
 .main-app {
@@ -901,25 +901,25 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--size-24);
+  padding: var(--space-24);
   background: var(--color-backdrop-soft);
   -webkit-app-region: no-drag;
 }
 
 .auth-overlay-inner {
   width: min(var(--size-440), 100%);
-  padding: var(--size-28);
+  padding: var(--space-28);
   border: var(--size-1) solid var(--vscode-border);
   background: linear-gradient(165deg, var(--color-surface-tint-04), var(--color-overlay-40));
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   box-shadow: var(--shadow-elevated);
 }
 
 .auth-brand {
   display: flex;
-  gap: var(--size-14);
+  gap: var(--space-14);
   align-items: flex-start;
-  margin-bottom: var(--size-20);
+  margin-bottom: var(--space-20);
 }
 
 .auth-logo {
@@ -938,7 +938,7 @@ button {
   letter-spacing: var(--letter-spacing-label-wide);
   text-transform: uppercase;
   color: var(--vscode-fg-muted);
-  margin: 0 0 var(--size-4);
+  margin: 0 0 var(--space-4);
 }
 
 .auth-title {
@@ -951,7 +951,7 @@ button {
 }
 
 .auth-subtitle {
-  margin: var(--size-8) 0 0;
+  margin: var(--space-8) 0 0;
   font-size: var(--type-body-size);
   line-height: var(--line-height-readable);
   color: var(--vscode-fg-muted);
@@ -961,12 +961,12 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--size-8);
+  gap: var(--space-8);
   width: 100%;
-  margin-top: var(--size-4);
-  padding: var(--size-9) var(--size-12);
+  margin-top: var(--space-4);
+  padding: var(--space-9) var(--space-12);
   border: var(--size-1) solid var(--vscode-border);
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   background: var(--color-surface-tint-05);
   color: var(--vscode-fg);
   font-size: var(--type-body-size);
@@ -987,8 +987,8 @@ button {
 .auth-or {
   display: flex;
   align-items: center;
-  gap: var(--size-10);
-  margin: var(--size-16) 0;
+  gap: var(--space-10);
+  margin: var(--space-16) 0;
   color: var(--vscode-fg-muted);
   font-family: var(--type-code-family);
   font-size: var(--type-caption-size);
@@ -1007,21 +1007,21 @@ button {
 .auth-email-form {
   display: flex;
   flex-direction: column;
-  gap: var(--size-10);
+  gap: var(--space-10);
 }
 
 .auth-field {
   display: flex;
   flex-direction: column;
-  gap: var(--size-4);
+  gap: var(--space-4);
   font-size: var(--type-caption-size);
   color: var(--vscode-fg-muted);
 }
 
 .auth-field input {
-  padding: var(--size-7) var(--size-9);
+  padding: var(--space-7) var(--space-9);
   border: var(--size-1) solid var(--vscode-border);
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   background: var(--color-panel-hover);
   color: var(--vscode-fg);
   font-size: var(--type-body-size);
@@ -1034,10 +1034,10 @@ button {
 }
 
 .auth-btn-secondary {
-  margin-top: var(--size-4);
-  padding: var(--size-8) var(--size-12);
+  margin-top: var(--space-4);
+  padding: var(--space-8) var(--space-12);
   border: none;
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   background: var(--color-accent);
   color: var(--color-white);
   font-size: var(--type-body-size);
@@ -1050,8 +1050,8 @@ button {
 }
 
 .auth-status {
-  margin-top: var(--size-10);
-  padding: var(--size-8) var(--size-10);
+  margin-top: var(--space-10);
+  padding: var(--space-8) var(--space-10);
   border: var(--size-1) solid var(--color-danger-border-strong);
   background: var(--color-danger-surface);
   color: var(--color-danger);
@@ -1060,11 +1060,11 @@ button {
 }
 
 .auth-btn-ghost {
-  margin-top: var(--size-14);
+  margin-top: var(--space-14);
   width: 100%;
-  padding: var(--size-8) var(--size-12);
+  padding: var(--space-8) var(--space-12);
   border: var(--size-1) dashed var(--color-surface-tint-16);
-  border-radius: var(--size-2);
+  border-radius: var(--radius-2);
   background: var(--color-transparent);
   color: var(--vscode-fg-muted);
   font-size: var(--type-body-size);
@@ -1077,7 +1077,7 @@ button {
 }
 
 .auth-hint {
-  margin: var(--size-14) 0 0;
+  margin: var(--space-14) 0 0;
   font-size: var(--type-caption-size);
   line-height: var(--line-height-body);
   color: var(--vscode-fg-muted);
