@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgentGrid - Auth Overlay</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;family=Space+Grotesk:wght@600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#72300a",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-dim": "#131313",
+                        "primary-fixed": "#ffddb8",
+                        "primary": "#ffc174",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-container": "#613b00",
+                        "tertiary-fixed-dim": "#ffb693",
+                        "inverse-surface": "#e5e2e1",
+                        "tertiary-fixed": "#ffdbcc",
+                        "on-tertiary": "#561f00",
+                        "on-secondary-fixed-variant": "#6e3900",
+                        "outline": "#a08e7a",
+                        "inverse-on-surface": "#313030",
+                        "on-background": "#e5e2e1",
+                        "surface-tint": "#ffb95f",
+                        "tertiary-container": "#f79a6c",
+                        "outline-variant": "#534434",
+                        "surface-container": "#201f1f",
+                        "secondary-fixed": "#ffdcc3",
+                        "surface-variant": "#353534",
+                        "on-tertiary-fixed-variant": "#76330d",
+                        "on-secondary-fixed": "#2f1500",
+                        "on-secondary-container": "#432100",
+                        "inverse-primary": "#855300",
+                        "surface-bright": "#393939",
+                        "primary-fixed-dim": "#ffb95f",
+                        "secondary-container": "#d97707",
+                        "on-secondary": "#4d2600",
+                        "surface-container-highest": "#353534",
+                        "surface-container-lowest": "#0e0e0e",
+                        "tertiary": "#ffbea0",
+                        "on-primary-fixed-variant": "#653e00",
+                        "on-error": "#690005",
+                        "secondary-fixed-dim": "#ffb77d",
+                        "on-surface-variant": "#d8c3ad",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed": "#351000",
+                        "surface-container-low": "#1c1b1b",
+                        "on-surface": "#e5e2e1",
+                        "on-primary-fixed": "#2a1700",
+                        "secondary": "#ffb77d",
+                        "primary-container": "#f59e0b",
+                        "background": "#131313",
+                        "error": "#ffb4ab",
+                        "surface": "#131313",
+                        "on-primary": "#472a00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "unit": "4px",
+                        "stack-sm": "8px",
+                        "gutter": "24px",
+                        "stack-lg": "32px",
+                        "margin-page": "48px"
+                    },
+                    "fontFamily": {
+                        "code-sm": [
+                            "JetBrains Mono"
+                        ],
+                        "headline-lg": [
+                            "Inter"
+                        ],
+                        "body-md": [
+                            "Inter"
+                        ],
+                        "display-xl": [
+                            "Inter"
+                        ],
+                        "label-caps": [
+                            "Space Grotesk"
+                        ]
+                    },
+                    "fontSize": {
+                        "code-sm": [
+                            "14px",
+                            {
+                                "lineHeight": "1.5",
+                                "fontWeight": "400"
+                            }
+                        ],
+                        "headline-lg": [
+                            "32px",
+                            {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                            }
+                        ],
+                        "body-md": [
+                            "16px",
+                            {
+                                "lineHeight": "1.6",
+                                "letterSpacing": "0",
+                                "fontWeight": "400"
+                            }
+                        ],
+                        "display-xl": [
+                            "48px",
+                            {
+                                "lineHeight": "1.1",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                            }
+                        ],
+                        "label-caps": [
+                            "12px",
+                            {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "0.1em",
+                                "fontWeight": "600"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex items-center justify-center relative overflow-hidden font-body-md text-body-md">
+<div class="absolute inset-0 z-0">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary-container/5 rounded-full blur-[120px] pointer-events-none"></div>
+</div>
+<main class="w-full max-w-md z-10 px-gutter">
+<div class="bg-surface-container/80 backdrop-blur-xl border border-white/5 rounded-xl shadow-[0_0_40px_rgba(245,158,11,0.05)] p-stack-lg relative overflow-hidden">
+<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary-container/50 to-transparent"></div>
+<div class="text-center mb-stack-lg">
+<div class="flex justify-center items-center gap-2 mb-stack-md">
+<span class="material-symbols-outlined text-primary-container text-4xl" style="font-variation-settings: 'FILL' 1;">
+                        grid_view
+                    </span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-background tracking-tighter">AgentGrid</h1>
+<p class="font-code-sm text-code-sm text-on-surface-variant mt-stack-sm">System Access Required</p>
+</div>
+<div class="space-y-stack-md">
+<button class="w-full flex items-center justify-center gap-3 bg-surface-container-high hover:bg-surface-bright text-on-background font-body-md text-body-md py-3 px-4 border border-white/10 rounded-lg transition-colors cursor-pointer group">
+<img alt="Google Logo" class="w-5 h-5 opacity-80 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnhx8vBmLejSHGVsnwswHR1CJk3_L4Oyej60inWI2eSrL3l4NWXZ7OKtcqcoEk7RPj4gDKFVN5aLCpeBdHZ-PYo3MjRJv_RSb9d23Oku3ced9KJKkkEkFfmcq14uBJ9qhuDm3zJvwtxEOr5DF647m-vBBd1X1V9janoTATzXI8_QoK2Kz8gM8Yz1RvKFnTpno-kule1PG5ZTToRV4Ac1vHV8Z0NURhcvsVM2uTJ9CUcJjVC2F8SqBPAIeYVQ_5kSIfNh5tREKg6Nw"/>
+                    Sign in with Google
+                </button>
+<div class="relative py-stack-sm flex items-center">
+<div class="flex-grow border-t border-white/5"></div>
+<span class="flex-shrink-0 mx-4 font-code-sm text-code-sm text-outline-variant uppercase">or</span>
+<div class="flex-grow border-t border-white/5"></div>
+</div>
+<button class="w-full flex items-center justify-center gap-3 bg-primary-container hover:bg-secondary-container text-[#050505] font-body-md text-body-md font-semibold py-3 px-4 rounded-lg transition-colors cursor-pointer shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+<span class="material-symbols-outlined text-[20px]">
+                        mail
+                    </span>
+                    Sign in with Email
+                </button>
+</div>
+<div class="mt-stack-lg text-center">
+<button class="font-code-sm text-code-sm text-on-surface-variant hover:text-primary-container transition-colors cursor-pointer flex items-center justify-center gap-2 mx-auto">
+<span class="material-symbols-outlined text-[16px]">
+                        terminal
+                    </span>
+                    Continue Locally
+                </button>
+</div>
+</div>
+</main>
+</body></html>

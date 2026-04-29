@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; connect-src 'self' ws://localhost:5173 http://localhost:5173"
+    />
+    <title>AgentGrid Desktop - Terminal Workspace</title>
+    <link rel="stylesheet" href="./tokens.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="auth-overlay" class="auth-overlay" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+      <div class="auth-overlay-inner">
+        <div class="auth-brand">
+          <img class="auth-logo" src="./logo.png" alt="" draggable="false" aria-hidden="true" />
+          <div>
+            <p class="auth-eyebrow">AgentGrid Desktop</p>
+            <h1 id="auth-title" class="auth-title">Sign in</h1>
+            <p class="auth-subtitle">
+              Sign in through your system browser. The desktop app never embeds the website login form.
+            </p>
+          </div>
+        </div>
+        <button type="button" id="auth-google-btn" class="auth-btn-primary">
+          <svg class="auth-google-icon" viewBox="0 0 24 24" aria-hidden="true" width="16" height="16">
+            <path
+              fill="var(--color-google-blue)"
+              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+            />
+            <path
+              fill="var(--color-google-green)"
+              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+            />
+            <path fill="var(--color-google-yellow)" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
+            <path
+              fill="var(--color-google-red)"
+              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+            />
+          </svg>
+          Continue with Google (browser)
+        </button>
+
+        <div class="auth-or"><span>or email</span></div>
+
+        <form id="auth-email-form" class="auth-email-form">
+          <button type="submit" class="auth-btn-secondary">Continue with email/password (browser)</button>
+        </form>
+
+        <div id="auth-status" class="auth-status" role="status" hidden></div>
+
+        <button type="button" id="auth-continue-local-btn" class="auth-btn-ghost">
+          Continue locally (no cloud sign-in)
+        </button>
+        <p class="auth-hint">
+          Local terminals can run without cloud sign-in. Account features use a browser handoff and OS-protected storage.
+        </p>
+      </div>
+    </div>
+
+    <div id="main-app" class="main-app" hidden>
+    <header class="app-header">
+      <div class="app-brand">
+        <img class="app-logo" src="./logo.png" alt="" aria-hidden="true" draggable="false" />
+        <span class="app-brand-name">AgentGrid</span>
+      </div>
+      <div class="app-tabs" id="app-tabs" role="tablist" aria-label="Workspace tabs"></div>
+      <div class="header-actions">
+        <span class="app-subtitle" id="status">starting...</span>
+        <button type="button" class="account-button" id="account-button">Sign in</button>
+        <div class="pane-count" id="pane-count" aria-label="Pane count" hidden></div>
+      </div>
+    </header>
+
+    <div class="tab-views" id="tab-views">
+      <section
+        id="home-panel"
+        class="tab-panel home-panel"
+        role="tabpanel"
+        aria-labelledby="tab-home"
+      >
+        <div class="home-inner">
+          <div class="home-hero">
+            <div class="home-hero-brand">
+              <img
+                class="home-hero-logo"
+                src="./logo.png"
+                alt=""
+                aria-hidden="true"
+                draggable="false"
+              />
+              <span class="home-hero-name">AgentGrid</span>
+            </div>
+            <p class="home-hero-tagline">
+              Multi-pane terminal workspaces. Each assignment opens a shell; CLI choices run their command automatically.
+            </p>
+          </div>
+
+          <div class="launcher-panel" id="launcher">
+            <div class="launcher-panel-header">
+              <div class="launcher-eyebrow">New workspace</div>
+              <p class="launcher-panel-intro">
+                Choose layout and slot tools. Opens in a new tab; Home stays available.
+              </p>
+            </div>
+
+            <div class="launcher-section project-folder-section">
+              <div class="launcher-label">Project folder</div>
+              <div class="project-folder-panel" id="project-folder-panel" data-state="empty">
+                <div class="project-folder-main">
+                  <div class="project-folder-icon" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    </svg>
+                  </div>
+                  <div class="project-folder-text">
+                    <div class="project-folder-path" id="project-folder-path">No folder selected</div>
+                    <div class="project-folder-hint" id="project-folder-hint">Choose a project folder before launching.</div>
+                  </div>
+                  <button type="button" id="project-folder-browse" class="project-folder-button">
+                    Browse&hellip;
+                  </button>
+                </div>
+                <div class="project-folder-footnote">
+                  Terminal cwd wiring is coming soon.
+                </div>
+              </div>
+            </div>
+
+            <div class="launcher-section">
+              <div class="launcher-label">Panes</div>
+              <div class="pane-count-selector" id="launcher-pane-count" role="radiogroup" aria-label="Pane count"></div>
+            </div>
+
+            <div class="launcher-section">
+              <div class="launcher-label">Slots</div>
+              <div class="pane-assignments" id="launcher-assignments"></div>
+            </div>
+
+            <div class="launcher-actions">
+              <button type="button" id="launch-button" class="primary-button">
+                <span class="primary-button-label">Start workspace</span>
+              </button>
+              <span class="launcher-actions-hint">Opens a new workspace tab.</span>
+            </div>
+          </div>
+
+          <div class="open-workspaces" id="open-workspaces" hidden>
+            <div class="launcher-label">Open</div>
+            <div class="open-workspaces-list" id="open-workspaces-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <div id="workspace-mount" class="workspace-mount"></div>
+    </div>
+
+    <script type="module" src="./main.ts"></script>
+    </div>
+  </body>
+</html>

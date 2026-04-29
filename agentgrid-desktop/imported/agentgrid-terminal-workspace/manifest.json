@@ -1,0 +1,84 @@
+﻿{
+    "importedAt":  "2026-04-29T20:47:43.4386955Z",
+    "source":  "Stitch MCP",
+    "project":  {
+                    "id":  "2273819608048190094",
+                    "name":  "projects/2273819608048190094",
+                    "title":  "AgentGrid Terminal Workspace",
+                    "createTime":  "2026-04-29T20:31:30.021477Z",
+                    "updateTime":  "2026-04-29T20:39:39.115804Z",
+                    "deviceType":  "DESKTOP",
+                    "projectType":  "TEXT_TO_UI_PRO",
+                    "visibility":  "PRIVATE"
+                },
+    "screens":  [
+                    {
+                        "id":  "fc33b4ba412f483a853a2e5078045ad0",
+                        "name":  "projects/2273819608048190094/screens/fc33b4ba412f483a853a2e5078045ad0",
+                        "title":  "AgentGrid - Home \u0026 Launcher (Obsidian)",
+                        "deviceType":  "DESKTOP",
+                        "width":  "2560",
+                        "height":  "2048",
+                        "codeFile":  "screens/fc33b4ba412f483a853a2e5078045ad0.html",
+                        "screenshotFile":  "screenshots/fc33b4ba412f483a853a2e5078045ad0.png",
+                        "htmlCodeName":  "projects/2273819608048190094/files/ed3cfdb9c198447dbbfd2ecc4209f34a",
+                        "screenshotName":  "projects/2273819608048190094/files/138a9e14113d4bf58c951929085d424a",
+                        "mimeType":  "text/html"
+                    },
+                    {
+                        "id":  "cca2532976634edcad6750a73872918c",
+                        "name":  "projects/2273819608048190094/screens/cca2532976634edcad6750a73872918c",
+                        "title":  "AgentGrid - Workspace Grid (Obsidian)",
+                        "deviceType":  "DESKTOP",
+                        "width":  "2560",
+                        "height":  "2194",
+                        "codeFile":  "screens/cca2532976634edcad6750a73872918c.html",
+                        "screenshotFile":  "screenshots/cca2532976634edcad6750a73872918c.png",
+                        "htmlCodeName":  "projects/2273819608048190094/files/228365b8fb2d4b299b48d2cdc59ccaf6",
+                        "screenshotName":  "projects/2273819608048190094/files/fef424a42d7f429da14c211f7b011102",
+                        "mimeType":  "text/html"
+                    },
+                    {
+                        "id":  "6b156e7b626541069fb910f55a2a2d8d",
+                        "name":  "projects/2273819608048190094/screens/6b156e7b626541069fb910f55a2a2d8d",
+                        "title":  "AgentGrid - Auth Overlay (Obsidian)",
+                        "deviceType":  "DESKTOP",
+                        "width":  "2560",
+                        "height":  "2048",
+                        "codeFile":  "screens/6b156e7b626541069fb910f55a2a2d8d.html",
+                        "screenshotFile":  "screenshots/6b156e7b626541069fb910f55a2a2d8d.png",
+                        "htmlCodeName":  "projects/2273819608048190094/files/bd391f5b71aa44a1b72fa99ba9e34a97",
+                        "screenshotName":  "projects/2273819608048190094/files/c48575a0121e4f70bcc99d27f648a07c",
+                        "mimeType":  "text/html"
+                    },
+                    {
+                        "id":  "9639227329512183800",
+                        "name":  "projects/2273819608048190094/screens/9639227329512183800",
+                        "title":  "image.png",
+                        "width":  "736",
+                        "height":  "1472",
+                        "codeFile":  null,
+                        "screenshotFile":  "screenshots/9639227329512183800.png",
+                        "htmlCodeName":  null,
+                        "screenshotName":  "projects/2273819608048190094/files/9639227329512183745",
+                        "mimeType":  null,
+                        "note":  "No htmlCode returned by Stitch MCP; archived screenshot and metadata only."
+                    }
+                ],
+    "designSystems":  [
+                          {
+                              "id":  "89fda497a3ff4b599fc84e772a4dc72d",
+                              "name":  "assets/89fda497a3ff4b599fc84e772a4dc72d",
+                              "displayName":  "AgentGrid Pro",
+                              "version":  "1",
+                              "file":  "design-systems/agentgrid-pro.md"
+                          },
+                          {
+                              "id":  "8b9fd0d6d0d2457a8cae78e4ca34d773",
+                              "name":  "assets/8b9fd0d6d0d2457a8cae78e4ca34d773",
+                              "displayName":  "Obsidian Glow",
+                              "version":  "1",
+                              "file":  "design-systems/obsidian-glow.md"
+                          }
+                      ]
+}

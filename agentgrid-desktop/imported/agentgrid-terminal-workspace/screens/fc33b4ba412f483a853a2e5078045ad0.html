@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgentGrid - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&amp;family=Inter:wght@400;600;700&amp;family=Space+Grotesk:wght@600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-container": "#72300a",
+                      "surface-container-high": "#2a2a2a",
+                      "surface-dim": "#131313",
+                      "primary-fixed": "#ffddb8",
+                      "primary": "#ffc174",
+                      "on-error-container": "#ffdad6",
+                      "on-primary-container": "#613b00",
+                      "tertiary-fixed-dim": "#ffb693",
+                      "inverse-surface": "#e5e2e1",
+                      "tertiary-fixed": "#ffdbcc",
+                      "on-tertiary": "#561f00",
+                      "on-secondary-fixed-variant": "#6e3900",
+                      "outline": "#a08e7a",
+                      "inverse-on-surface": "#313030",
+                      "on-background": "#e5e2e1",
+                      "surface-tint": "#ffb95f",
+                      "tertiary-container": "#f79a6c",
+                      "outline-variant": "#534434",
+                      "surface-container": "#201f1f",
+                      "secondary-fixed": "#ffdcc3",
+                      "surface-variant": "#353534",
+                      "on-tertiary-fixed-variant": "#76330d",
+                      "on-secondary-fixed": "#2f1500",
+                      "on-secondary-container": "#432100",
+                      "inverse-primary": "#855300",
+                      "surface-bright": "#393939",
+                      "primary-fixed-dim": "#ffb95f",
+                      "secondary-container": "#d97707",
+                      "on-secondary": "#4d2600",
+                      "surface-container-highest": "#353534",
+                      "surface-container-lowest": "#0e0e0e",
+                      "tertiary": "#ffbea0",
+                      "on-primary-fixed-variant": "#653e00",
+                      "on-error": "#690005",
+                      "secondary-fixed-dim": "#ffb77d",
+                      "on-surface-variant": "#d8c3ad",
+                      "error-container": "#93000a",
+                      "on-tertiary-fixed": "#351000",
+                      "surface-container-low": "#1c1b1b",
+                      "on-surface": "#e5e2e1",
+                      "on-primary-fixed": "#2a1700",
+                      "secondary": "#ffb77d",
+                      "primary-container": "#f59e0b",
+                      "background": "#131313",
+                      "error": "#ffb4ab",
+                      "surface": "#131313",
+                      "on-primary": "#472a00"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "stack-md": "16px",
+                      "unit": "4px",
+                      "stack-sm": "8px",
+                      "gutter": "24px",
+                      "stack-lg": "32px",
+                      "margin-page": "48px"
+              },
+              "fontFamily": {
+                      "code-sm": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "display-xl": [
+                              "Inter"
+                      ],
+                      "label-caps": [
+                              "Space Grotesk"
+                      ]
+              },
+              "fontSize": {
+                      "code-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-xl": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0B0B0B;
+            background-image: radial-gradient(circle at 100% 0%, rgba(245, 158, 11, 0.15) 0%, transparent 40%),
+                              radial-gradient(circle at 0% 100%, rgba(245, 158, 11, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+        .glass-panel {
+            background: rgba(18, 18, 18, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        .amber-glow:hover {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+        .active-amber-glow {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+            border-color: #F59E0B;
+        }
+    </style>
+</head>
+<body class="text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-[#0B0B0B] dark:bg-[#0B0B0B] text-amber-500 dark:text-amber-500 font-code-sm text-code-sm uppercase tracking-wider text-sm docked full-width top-0 border-b border-b border-amber-500/30 shadow-[0_4px_20px_rgba(245,158,11,0.05)] flex justify-between items-center w-full px-6 h-16 z-50">
+<div class="flex items-center gap-gutter">
+<div class="text-xl font-black text-amber-500 tracking-tighter">AgentGrid</div>
+<div class="hidden md:flex gap-stack-lg ml-margin-page">
+<a class="text-amber-500 border-b-2 border-amber-500 pb-1" href="#">Workspaces</a>
+<a class="text-zinc-500 hover:text-zinc-300 transition-colors hover:bg-amber-500/10 hover:text-amber-400 transition-all active:scale-95 duration-200 cursor-pointer" href="#">Logs</a>
+<a class="text-zinc-500 hover:text-zinc-300 transition-colors hover:bg-amber-500/10 hover:text-amber-400 transition-all active:scale-95 duration-200 cursor-pointer" href="#">Monitors</a>
+</div>
+</div>
+<div class="flex items-center gap-stack-md">
+<div class="hidden md:flex items-center bg-surface-container-high rounded border border-surface-variant px-stack-sm py-unit">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-unit">search</span>
+<input class="bg-transparent border-none text-on-surface focus:ring-0 text-sm font-code-sm w-48 placeholder-surface-variant outline-none" placeholder="Search..." type="text"/>
+</div>
+<button class="bg-primary-container text-black font-label-caps text-label-caps px-stack-md py-stack-sm rounded hover:bg-gradient-to-r hover:from-primary-container hover:to-secondary-container transition-all">Connect Node</button>
+<div class="flex gap-stack-sm text-zinc-500">
+<button class="hover:text-amber-400 transition-colors"><span class="material-symbols-outlined">account_tree</span></button>
+<button class="hover:text-amber-400 transition-colors"><span class="material-symbols-outlined">settings</span></button>
+</div>
+</div>
+</nav>
+<div class="flex flex-1 overflow-hidden relative">
+<!-- SideNavBar -->
+<aside class="bg-[#121212]/80 dark:bg-[#121212]/80 backdrop-blur-xl text-amber-500 dark:text-amber-500 font-code-sm text-code-sm text-xs uppercase docked left-0 h-screen w-20 border-r border-r border-white/5 shadow-2xl flex flex-col items-center py-8 w-20 fixed left-0 top-16 h-[calc(100vh-64px)] z-40 hidden md:flex">
+<div class="flex flex-col gap-stack-md w-full flex-1">
+<a class="text-zinc-600 flex flex-col items-center py-4 w-full hover:text-amber-300 hover:bg-white/5 transition-all active:translate-x-1 duration-150 group" href="#" title="Explorer">
+<span class="material-symbols-outlined text-2xl group-hover:text-amber-400">folder_open</span>
+</a>
+<a class="text-zinc-600 flex flex-col items-center py-4 w-full hover:text-amber-300 hover:bg-white/5 transition-all active:translate-x-1 duration-150 group" href="#" title="Debugger">
+<span class="material-symbols-outlined text-2xl group-hover:text-amber-400">bug_report</span>
+</a>
+<a class="text-zinc-600 flex flex-col items-center py-4 w-full hover:text-amber-300 hover:bg-white/5 transition-all active:translate-x-1 duration-150 group" href="#" title="Terminal">
+<span class="material-symbols-outlined text-2xl group-hover:text-amber-400">terminal</span>
+</a>
+</div>
+<div class="flex flex-col gap-stack-md w-full mt-auto pb-stack-lg border-t border-white/5 pt-stack-md">
+<a class="text-zinc-600 flex flex-col items-center py-4 w-full hover:text-amber-300 hover:bg-white/5 transition-all active:translate-x-1 duration-150 group" href="#" title="Settings">
+<span class="material-symbols-outlined text-xl group-hover:text-amber-400">settings</span>
+</a>
+<a class="text-zinc-600 flex flex-col items-center py-4 w-full hover:text-amber-300 hover:bg-white/5 transition-all active:translate-x-1 duration-150 group" href="#" title="Support">
+<span class="material-symbols-outlined text-xl group-hover:text-amber-400">help_outline</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 md:ml-20 overflow-y-auto p-margin-page relative z-10">
+<div class="max-w-6xl mx-auto space-y-stack-lg">
+<!-- Hero Section -->
+<header class="mb-margin-page">
+<h1 class="font-display-xl text-display-xl text-on-surface mb-stack-sm tracking-tight">Initialize <span class="text-primary-container">Workspace</span></h1>
+<p class="font-code-sm text-code-sm text-on-surface-variant max-w-2xl">Configure your environment parameters. Select project root, define layout topology, and assign operational tools.</p>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column: Primary Config -->
+<div class="lg:col-span-8 space-y-stack-lg">
+<!-- Project Selection -->
+<section class="glass-panel rounded-xl p-stack-lg relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-b from-[#1A1A1A] to-[#121212] opacity-50 z-0"></div>
+<div class="relative z-10">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-stack-md flex items-center gap-stack-sm">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">folder</span>
+                                    Project Root
+                                </h2>
+<div class="flex items-center gap-stack-sm bg-[#050505] border border-surface-variant rounded-lg p-stack-sm focus-within:border-primary-container focus-within:shadow-[0_0_10px_rgba(245,158,11,0.1)] transition-all">
+<span class="material-symbols-outlined text-on-surface-variant ml-unit">search</span>
+<input class="bg-transparent border-none text-primary-fixed font-code-sm text-code-sm w-full focus:ring-0 outline-none" type="text" value="~/workspace/agent-core-v2"/>
+<button class="bg-surface-variant text-on-surface px-stack-sm py-unit rounded font-label-caps text-label-caps hover:bg-surface-bright transition-colors">Browse</button>
+</div>
+<div class="mt-stack-md grid grid-cols-1 md:grid-cols-3 gap-stack-sm">
+<div class="border border-surface-variant rounded-lg p-stack-sm hover:border-primary-container/50 cursor-pointer transition-colors bg-surface-container-low">
+<div class="font-code-sm text-code-sm text-on-surface truncate">/frontend-app</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant mt-unit text-[10px]">React • 2 days ago</div>
+</div>
+<div class="border border-surface-variant rounded-lg p-stack-sm hover:border-primary-container/50 cursor-pointer transition-colors bg-surface-container-low">
+<div class="font-code-sm text-code-sm text-on-surface truncate">/data-pipeline</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant mt-unit text-[10px]">Python • 5 hrs ago</div>
+</div>
+<div class="border border-surface-variant rounded-lg p-stack-sm hover:border-primary-container/50 cursor-pointer transition-colors bg-surface-container-low">
+<div class="font-code-sm text-code-sm text-on-surface truncate">/infra-configs</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant mt-unit text-[10px]">Terraform • 1 week ago</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Tool Assignments -->
+<section class="glass-panel rounded-xl p-stack-lg relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-b from-[#1A1A1A] to-[#121212] opacity-50 z-0"></div>
+<div class="relative z-10">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-stack-md flex items-center gap-stack-sm">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">build</span>
+                                    Operational Tools
+                                </h2>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-stack-md">
+<!-- Active Tool -->
+<div class="border border-primary-container bg-primary-container/10 rounded-lg p-stack-md flex flex-col items-center justify-center text-center cursor-pointer active-amber-glow transition-all">
+<span class="material-symbols-outlined text-primary-container text-3xl mb-stack-sm">terminal</span>
+<span class="font-label-caps text-label-caps text-on-surface">CLI Agent</span>
+<span class="font-code-sm text-code-sm text-primary-container text-[10px] mt-unit">v1.2.0</span>
+</div>
+<div class="border border-surface-variant bg-surface-container-low rounded-lg p-stack-md flex flex-col items-center justify-center text-center cursor-pointer amber-glow transition-all">
+<span class="material-symbols-outlined text-on-surface-variant text-3xl mb-stack-sm">database</span>
+<span class="font-label-caps text-label-caps text-on-surface">DB Inspector</span>
+</div>
+<div class="border border-primary-container bg-primary-container/10 rounded-lg p-stack-md flex flex-col items-center justify-center text-center cursor-pointer active-amber-glow transition-all">
+<span class="material-symbols-outlined text-primary-container text-3xl mb-stack-sm">api</span>
+<span class="font-label-caps text-label-caps text-on-surface">API Tester</span>
+<span class="font-code-sm text-code-sm text-primary-container text-[10px] mt-unit">Active</span>
+</div>
+<div class="border border-surface-variant bg-surface-container-low rounded-lg p-stack-md flex flex-col items-center justify-center text-center cursor-pointer amber-glow transition-all border-dashed">
+<span class="material-symbols-outlined text-on-surface-variant text-3xl mb-stack-sm">add</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Add Tool</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Layout & Launch -->
+<div class="lg:col-span-4 space-y-stack-lg">
+<!-- Pane Configuration -->
+<section class="glass-panel rounded-xl p-stack-lg relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-b from-[#1A1A1A] to-[#121212] opacity-50 z-0"></div>
+<div class="relative z-10">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-stack-md text-xl flex items-center gap-stack-sm">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                                    Layout Topology
+                                </h2>
+<div class="grid grid-cols-3 gap-stack-sm mb-stack-md">
+<!-- 1 Pane -->
+<div class="aspect-square border border-surface-variant rounded flex items-center justify-center bg-surface-container-low hover:border-primary-container cursor-pointer transition-colors p-unit">
+<div class="w-full h-full bg-surface-variant rounded-sm"></div>
+</div>
+<!-- 2 Panes (Active) -->
+<div class="aspect-square border border-primary-container rounded flex items-center justify-center bg-primary-container/10 active-amber-glow cursor-pointer transition-colors p-unit gap-unit">
+<div class="w-1/2 h-full bg-primary-container/40 rounded-sm border border-primary-container/50"></div>
+<div class="w-1/2 h-full bg-primary-container/40 rounded-sm border border-primary-container/50"></div>
+</div>
+<!-- 4 Panes -->
+<div class="aspect-square border border-surface-variant rounded flex flex-col bg-surface-container-low hover:border-primary-container cursor-pointer transition-colors p-unit gap-unit">
+<div class="flex w-full h-1/2 gap-unit">
+<div class="w-1/2 h-full bg-surface-variant rounded-sm"></div>
+<div class="w-1/2 h-full bg-surface-variant rounded-sm"></div>
+</div>
+<div class="flex w-full h-1/2 gap-unit">
+<div class="w-1/2 h-full bg-surface-variant rounded-sm"></div>
+<div class="w-1/2 h-full bg-surface-variant rounded-sm"></div>
+</div>
+</div>
+</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant text-center">Split View (Vertical)</div>
+</div>
+</section>
+<!-- Launch Action -->
+<section class="glass-panel rounded-xl p-stack-lg flex flex-col items-center justify-center text-center mt-auto border-t-4 border-t-primary-container">
+<div class="mb-stack-md">
+<span class="material-symbols-outlined text-4xl text-primary-container mb-unit block">rocket_launch</span>
+<div class="font-code-sm text-code-sm text-on-surface-variant">System Status: <span class="text-green-500">Optimal</span></div>
+</div>
+<button class="w-full bg-primary-container text-black font-label-caps text-label-caps py-stack-md rounded-lg hover:bg-gradient-to-r hover:from-primary-container hover:to-secondary-container transition-all text-lg tracking-widest shadow-[0_0_15px_rgba(245,158,11,0.4)] hover:shadow-[0_0_25px_rgba(245,158,11,0.6)]">
+                                START WORKSPACE
+                            </button>
+</section>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

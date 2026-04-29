@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgentGrid - Workspaces</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;family=Space+Grotesk:wght@600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-container": "#72300a",
+                      "surface-container-high": "#2a2a2a",
+                      "surface-dim": "#131313",
+                      "primary-fixed": "#ffddb8",
+                      "primary": "#ffc174",
+                      "on-error-container": "#ffdad6",
+                      "on-primary-container": "#613b00",
+                      "tertiary-fixed-dim": "#ffb693",
+                      "inverse-surface": "#e5e2e1",
+                      "tertiary-fixed": "#ffdbcc",
+                      "on-tertiary": "#561f00",
+                      "on-secondary-fixed-variant": "#6e3900",
+                      "outline": "#a08e7a",
+                      "inverse-on-surface": "#313030",
+                      "on-background": "#e5e2e1",
+                      "surface-tint": "#ffb95f",
+                      "tertiary-container": "#f79a6c",
+                      "outline-variant": "#534434",
+                      "surface-container": "#201f1f",
+                      "secondary-fixed": "#ffdcc3",
+                      "surface-variant": "#353534",
+                      "on-tertiary-fixed-variant": "#76330d",
+                      "on-secondary-fixed": "#2f1500",
+                      "on-secondary-container": "#432100",
+                      "inverse-primary": "#855300",
+                      "surface-bright": "#393939",
+                      "primary-fixed-dim": "#ffb95f",
+                      "secondary-container": "#d97707",
+                      "on-secondary": "#4d2600",
+                      "surface-container-highest": "#353534",
+                      "surface-container-lowest": "#0e0e0e",
+                      "tertiary": "#ffbea0",
+                      "on-primary-fixed-variant": "#653e00",
+                      "on-error": "#690005",
+                      "secondary-fixed-dim": "#ffb77d",
+                      "on-surface-variant": "#d8c3ad",
+                      "error-container": "#93000a",
+                      "on-tertiary-fixed": "#351000",
+                      "surface-container-low": "#1c1b1b",
+                      "on-surface": "#e5e2e1",
+                      "on-primary-fixed": "#2a1700",
+                      "secondary": "#ffb77d",
+                      "primary-container": "#f59e0b",
+                      "background": "#131313",
+                      "error": "#ffb4ab",
+                      "surface": "#131313",
+                      "on-primary": "#472a00"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "stack-md": "16px",
+                      "unit": "4px",
+                      "stack-sm": "8px",
+                      "gutter": "24px",
+                      "stack-lg": "32px",
+                      "margin-page": "48px"
+              },
+              "fontFamily": {
+                      "code-sm": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "display-xl": [
+                              "Inter"
+                      ],
+                      "label-caps": [
+                              "Space Grotesk"
+                      ]
+              },
+              "fontSize": {
+                      "code-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-xl": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-[#0B0B0B] dark:bg-[#0B0B0B] border-b border-amber-500/30 shadow-[0_4px_20px_rgba(245,158,11,0.05)] docked full-width top-0 z-50">
+<div class="flex justify-between items-center w-full px-6 h-16">
+<!-- Brand -->
+<div class="flex items-center gap-stack-md">
+<span class="text-xl font-black text-amber-500 tracking-tighter">AgentGrid</span>
+</div>
+<!-- Navigation -->
+<nav class="hidden md:flex gap-stack-md">
+<a class="font-code-sm text-code-sm uppercase tracking-wider text-amber-500 border-b-2 border-amber-500 pb-1 active:scale-95 duration-200 cursor-pointer" href="#">Workspaces</a>
+<a class="font-code-sm text-code-sm uppercase tracking-wider text-zinc-500 hover:text-zinc-300 hover:bg-amber-500/10 hover:text-amber-400 transition-all transition-colors active:scale-95 duration-200 cursor-pointer pb-1" href="#">Logs</a>
+<a class="font-code-sm text-code-sm uppercase tracking-wider text-zinc-500 hover:text-zinc-300 hover:bg-amber-500/10 hover:text-amber-400 transition-all transition-colors active:scale-95 duration-200 cursor-pointer pb-1" href="#">Monitors</a>
+</nav>
+<!-- Actions -->
+<div class="flex items-center gap-stack-md">
+<button class="bg-primary-container text-black font-label-caps text-label-caps px-4 py-2 rounded uppercase tracking-wider hover:bg-amber-400 transition-colors">Connect Node</button>
+<div class="flex gap-unit">
+<button class="p-2 text-zinc-500 hover:text-amber-400 hover:bg-amber-500/10 transition-all rounded">
+<span class="material-symbols-outlined">account_tree</span>
+</button>
+<button class="p-2 text-zinc-500 hover:text-amber-400 hover:bg-amber-500/10 transition-all rounded">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 pt-16">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col items-center py-8 w-20 fixed left-0 top-16 h-[calc(100vh-64px)] z-40 bg-[#121212]/80 dark:bg-[#121212]/80 backdrop-blur-xl border-r border-white/5 shadow-2xl justify-between">
+<div class="flex flex-col gap-unit w-full">
+<a class="text-amber-500 bg-amber-500/5 border-r-2 border-amber-500 flex flex-col items-center py-4 w-full active:translate-x-1 duration-150 group" href="#">
+<span class="material-symbols-outlined mb-1">folder_open</span>
+<span class="font-code-sm text-[10px] uppercase">Explorer</span>
+</a>
+<a class="text-zinc-600 flex flex-col items-center py-4 w-full hover:text-amber-300 hover:bg-white/5 transition-all active:translate-x-1 duration-150 group" href="#">
+<span class="material-symbols-outlined mb-1 group-hover:text-amber-300">bug_report</span>
+<span class="font-code-sm text-[10px] uppercase">Debugger</span>
+</a>
+<a class="text-zinc-600 flex flex-col items-center py-4 w-full hover:text-amber-300 hover:bg-white/5 transition-all active:translate-x-1 duration-150 group" href="#">
+<span class="material-symbols-outlined mb-1 group-hover:text-amber-300">terminal</span>
+<span class="font-code-sm text-[10px] uppercase">Terminal</span>
+</a>
+</div>
+<div class="flex flex-col gap-unit w-full">
+<a class="text-zinc-600 flex flex-col items-center py-4 w-full hover:text-amber-300 hover:bg-white/5 transition-all active:translate-x-1 duration-150 group" href="#">
+<span class="material-symbols-outlined mb-1 group-hover:text-amber-300">settings</span>
+<span class="font-code-sm text-[10px] uppercase">Settings</span>
+</a>
+<a class="text-zinc-600 flex flex-col items-center py-4 w-full hover:text-amber-300 hover:bg-white/5 transition-all active:translate-x-1 duration-150 group" href="#">
+<span class="material-symbols-outlined mb-1 group-hover:text-amber-300">help_outline</span>
+<span class="font-code-sm text-[10px] uppercase">Support</span>
+</a>
+</div>
+</nav>
+<!-- Main Workspace Area -->
+<main class="flex-1 md:ml-20 p-gutter flex flex-col gap-gutter bg-background relative overflow-hidden">
+<!-- Decorative Light Leak -->
+<div class="absolute top-1/4 left-1/3 w-96 h-96 bg-amber-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="flex justify-between items-end">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-stack-sm">Active Workspace: Grid-Alpha</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Monitoring 4 active nodes. System status optimal.</p>
+</div>
+<div class="flex gap-stack-sm">
+<button class="bg-surface-container border border-outline-variant text-primary font-code-sm text-code-sm px-4 py-2 rounded flex items-center gap-2 hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-sm">play_arrow</span> Run All
+                    </button>
+</div>
+</div>
+<!-- Bento Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter h-[calc(100vh-200px)]">
+<!-- Claude Code Shell (Main) -->
+<div class="lg:col-span-8 bg-[#121212] border border-[#ffffff0a] rounded-xl flex flex-col backdrop-blur-md shadow-[0_0_20px_rgba(245,158,11,0.02)] overflow-hidden">
+<div class="bg-[#0B0B0B] border-b border-[#ffffff0a] px-4 py-2 flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+<span class="font-code-sm text-[12px] text-surface-tint uppercase tracking-wider">Claude Code Shell</span>
+</div>
+<div class="flex gap-2 text-zinc-500">
+<span class="material-symbols-outlined text-sm cursor-pointer hover:text-on-surface">content_copy</span>
+<span class="material-symbols-outlined text-sm cursor-pointer hover:text-on-surface">open_in_full</span>
+</div>
+</div>
+<div class="flex-1 p-4 bg-[#050505] font-code-sm text-code-sm overflow-y-auto">
+<div class="text-zinc-500 mb-2"># Analyzing system configuration...</div>
+<div class="text-amber-500/80 mb-2">&gt; Agent initialized. Awaiting commands.</div>
+<div class="text-on-surface mb-1"><span class="text-primary-container">user@grid</span>:<span class="text-tertiary">~/workspace/alpha</span>$ ./run_analysis.sh</div>
+<div class="text-emerald-400/90 mb-1">[OK] Database connection established.</div>
+<div class="text-emerald-400/90 mb-1">[OK] Worker nodes synchronized.</div>
+<div class="text-on-surface mb-1">Processing data streams... <span class="text-amber-500">24%</span></div>
+<div class="text-zinc-400 mt-4 animate-pulse">_</div>
+</div>
+</div>
+<!-- Right Column Stack -->
+<div class="lg:col-span-4 flex flex-col gap-gutter h-full">
+<!-- Node Metrics -->
+<div class="flex-1 bg-[#121212] border border-[#ffffff0a] rounded-xl flex flex-col backdrop-blur-md overflow-hidden relative">
+<div class="absolute inset-0 bg-gradient-to-b from-[#1A1A1A] to-transparent pointer-events-none opacity-50"></div>
+<div class="bg-[#0B0B0B] border-b border-[#ffffff0a] px-4 py-2 flex justify-between items-center relative z-10">
+<span class="font-code-sm text-[12px] text-zinc-400 uppercase tracking-wider">Node Metrics</span>
+<span class="material-symbols-outlined text-sm text-zinc-500">bar_chart</span>
+</div>
+<div class="p-4 flex flex-col gap-4 relative z-10">
+<div>
+<div class="flex justify-between font-code-sm text-[12px] mb-1">
+<span class="text-on-surface">CPU Usage</span>
+<span class="text-amber-500">78%</span>
+</div>
+<div class="h-1 bg-surface-container rounded overflow-hidden">
+<div class="h-full bg-amber-500 w-[78%] shadow-[0_0_8px_rgba(245,158,11,0.5)]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-code-sm text-[12px] mb-1">
+<span class="text-on-surface">Memory Allocation</span>
+<span class="text-emerald-400">42%</span>
+</div>
+<div class="h-1 bg-surface-container rounded overflow-hidden">
+<div class="h-full bg-emerald-400 w-[42%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-code-sm text-[12px] mb-1">
+<span class="text-on-surface">Network I/O</span>
+<span class="text-tertiary-container">91%</span>
+</div>
+<div class="h-1 bg-surface-container rounded overflow-hidden">
+<div class="h-full bg-tertiary-container w-[91%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Server Logs -->
+<div class="flex-1 bg-[#121212] border border-[#ffffff0a] rounded-xl flex flex-col backdrop-blur-md overflow-hidden">
+<div class="bg-[#0B0B0B] border-b border-[#ffffff0a] px-4 py-2 flex justify-between items-center">
+<span class="font-code-sm text-[12px] text-zinc-400 uppercase tracking-wider">Server Logs</span>
+<span class="material-symbols-outlined text-sm text-zinc-500">list_alt</span>
+</div>
+<div class="p-4 bg-[#050505] font-code-sm text-[11px] leading-relaxed overflow-y-auto flex-1">
+<div class="text-zinc-500 break-all">[14:22:01] <span class="text-emerald-400">INFO</span> Connection accepted from 192.168.1.104</div>
+<div class="text-zinc-500 break-all">[14:22:05] <span class="text-amber-500">WARN</span> High latency detected on shard-02 (250ms)</div>
+<div class="text-zinc-500 break-all">[14:22:10] <span class="text-emerald-400">INFO</span> Cache synchronized successfully.</div>
+<div class="text-zinc-500 break-all">[14:22:15] <span class="text-red-400">ERR</span>  Failed to resolve external dependency: api.metric.io</div>
+<div class="text-zinc-500 break-all">[14:22:16] <span class="text-emerald-400">INFO</span> Retrying connection (1/3)...</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
