@@ -25,8 +25,9 @@ body {
   background: var(--vscode-bg);
   color: var(--vscode-fg);
   font-family:
-    var(--font-family-body);
-  font-size: var(--font-size-13);
+    var(--type-body-family);
+  font-size: var(--type-body-size);
+  font-synthesis: none;
   overflow: hidden;
 }
 
@@ -79,10 +80,11 @@ button {
 
 .app-brand-name {
   color: var(--vscode-fg);
-  font-size: var(--font-size-12);
-  font-weight: var(--font-weight-strong);
-  letter-spacing: 0.01em;
-  line-height: 1;
+  font-family: var(--type-heading-family);
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-heading-weight);
+  letter-spacing: var(--letter-spacing-brand);
+  line-height: var(--line-height-tight);
   white-space: nowrap;
 }
 
@@ -95,7 +97,7 @@ button {
   background: var(--color-surface-tint-03);
   color: var(--vscode-fg);
   cursor: default;
-  font-size: var(--font-size-12);
+  font-size: var(--type-body-size);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -141,8 +143,8 @@ button {
   background: var(--vscode-tab-inactive);
   color: var(--vscode-fg-muted);
   cursor: default;
-  font-size: var(--font-size-12);
-  font-weight: var(--font-weight-regular);
+  font-size: var(--type-body-size);
+  font-weight: var(--type-body-weight);
   white-space: nowrap;
   flex: 0 0 auto;
   max-width: var(--size-200);
@@ -189,7 +191,7 @@ button {
   min-width: var(--size-20);
   height: var(--size-16);
   padding: 0 var(--size-4);
-  font-size: var(--font-size-10);
+  font-size: var(--type-micro-size);
   font-weight: var(--font-weight-medium);
   border-radius: var(--size-2);
   background: var(--color-surface-tint-06);
@@ -221,7 +223,7 @@ button {
   border-radius: var(--size-2);
   color: var(--vscode-fg-muted);
   font-size: var(--font-size-14);
-  line-height: 1;
+  line-height: var(--line-height-tight);
   cursor: pointer;
 }
 
@@ -246,7 +248,7 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: var(--font-size-11);
+  font-size: var(--type-caption-size);
   color: var(--vscode-fg-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -269,7 +271,7 @@ button {
   background: transparent;
   color: var(--vscode-fg-muted);
   cursor: pointer;
-  font-size: var(--font-size-11);
+  font-size: var(--type-caption-size);
 }
 
 .pane-count button:hover {
@@ -373,8 +375,8 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: var(--font-size-11);
-  font-weight: var(--font-weight-regular);
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-body-weight);
   font-family:
     var(--font-family-code);
   color: var(--vscode-fg);
@@ -383,7 +385,7 @@ button {
 .pane-status {
   flex: 0 0 auto;
   white-space: nowrap;
-  font-size: var(--font-size-10);
+  font-size: var(--type-micro-size);
   color: var(--vscode-fg-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -409,8 +411,8 @@ button {
   color: var(--vscode-fg-muted);
   cursor: pointer;
   padding: var(--size-1) var(--size-6);
-  font-size: var(--font-size-11);
-  line-height: 1.2;
+  font-size: var(--type-caption-size);
+  line-height: var(--line-height-ui);
 }
 
 .pane-action:hover {
@@ -421,7 +423,7 @@ button {
 .pane-close {
   padding: var(--size-1) var(--size-5);
   font-size: var(--font-size-13);
-  line-height: 1;
+  line-height: var(--line-height-tight);
 }
 
 .pane-close:hover {
@@ -505,16 +507,17 @@ button {
 
 .home-hero-name {
   color: var(--vscode-fg);
-  font-size: var(--font-size-22);
+  font-family: var(--type-heading-family);
+  font-size: var(--type-display-size);
   font-weight: var(--font-weight-bold);
-  letter-spacing: 0.01em;
-  line-height: 1;
+  letter-spacing: var(--letter-spacing-brand);
+  line-height: var(--line-height-tight);
 }
 
 .home-hero-tagline {
   margin: 0;
-  font-size: var(--font-size-12);
-  line-height: 1.45;
+  font-size: var(--type-body-size);
+  line-height: var(--line-height-body);
   color: var(--vscode-fg-muted);
   max-width: var(--size-520);
 }
@@ -534,9 +537,10 @@ button {
 }
 
 .launcher-eyebrow {
-  font-size: var(--font-size-11);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.06em;
+  font-family: var(--type-code-family);
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--letter-spacing-label);
   text-transform: uppercase;
   color: var(--vscode-fg-muted);
   margin-bottom: var(--size-4);
@@ -544,8 +548,8 @@ button {
 
 .launcher-panel-intro {
   margin: 0;
-  font-size: var(--font-size-12);
-  line-height: 1.45;
+  font-size: var(--type-body-size);
+  line-height: var(--line-height-body);
   color: var(--vscode-fg-muted);
 }
 
@@ -557,9 +561,10 @@ button {
 }
 
 .launcher-label {
-  font-size: var(--font-size-11);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.03em;
+  font-family: var(--type-code-family);
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--letter-spacing-ui);
   color: var(--vscode-fg-muted);
 }
 
@@ -606,7 +611,7 @@ button {
 }
 
 .project-folder-path {
-  font-size: var(--font-size-12);
+  font-size: var(--type-body-size);
   font-weight: var(--font-weight-medium);
   color: var(--vscode-fg);
   font-family: var(--font-family-code);
@@ -622,7 +627,7 @@ button {
 }
 
 .project-folder-hint {
-  font-size: var(--font-size-11);
+  font-size: var(--type-caption-size);
   color: var(--vscode-fg-muted);
 }
 
@@ -633,7 +638,7 @@ button {
   border-radius: var(--size-2);
   background: var(--color-surface-tint-04);
   color: var(--vscode-fg);
-  font-size: var(--font-size-11);
+  font-size: var(--type-caption-size);
   cursor: pointer;
 }
 
@@ -642,7 +647,7 @@ button {
 }
 
 .project-folder-footnote {
-  font-size: var(--font-size-10);
+  font-size: var(--type-micro-size);
   color: var(--vscode-fg-muted);
   padding-left: var(--size-34);
 }
@@ -696,7 +701,7 @@ button {
 }
 
 .assignment-row .assignment-label {
-  font-size: var(--font-size-11);
+  font-size: var(--type-caption-size);
   font-weight: var(--font-weight-medium);
   color: var(--vscode-fg-muted);
   text-align: right;
@@ -710,7 +715,7 @@ button {
   border-radius: var(--size-2);
   background: var(--color-panel-hover);
   color: var(--vscode-fg);
-  font-size: var(--font-size-12);
+  font-size: var(--type-body-size);
   cursor: pointer;
 }
 
@@ -720,9 +725,9 @@ button {
 }
 
 .assignment-row .assignment-status {
-  font-size: var(--font-size-10);
+  font-size: var(--type-micro-size);
   color: var(--vscode-fg-muted);
-  line-height: 1.3;
+  line-height: var(--line-height-compact);
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -738,7 +743,7 @@ button {
 }
 
 .launcher-actions-hint {
-  font-size: var(--font-size-11);
+  font-size: var(--type-caption-size);
   color: var(--vscode-fg-muted);
 }
 
@@ -751,7 +756,7 @@ button {
   border-radius: var(--size-2);
   background: var(--color-accent);
   color: var(--color-white);
-  font-size: var(--font-size-12);
+  font-size: var(--type-body-size);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
   min-height: var(--size-24);
@@ -786,7 +791,7 @@ button {
   background: var(--color-overlay-20);
   color: var(--vscode-fg);
   cursor: pointer;
-  font-size: var(--font-size-11);
+  font-size: var(--type-caption-size);
 }
 
 .open-workspace-card:hover {
@@ -798,7 +803,7 @@ button {
 }
 
 .open-workspace-meta {
-  font-size: var(--font-size-10);
+  font-size: var(--type-micro-size);
   color: var(--vscode-fg-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -835,7 +840,7 @@ button {
 }
 
 .pane-picker-title {
-  font-size: var(--font-size-12);
+  font-size: var(--type-body-size);
   color: var(--vscode-fg);
 }
 
@@ -851,7 +856,7 @@ button {
   border: var(--size-1) solid var(--vscode-border);
   border-radius: var(--size-2);
   padding: var(--size-3) var(--size-6);
-  font-size: var(--font-size-12);
+  font-size: var(--type-body-size);
 }
 
 .pane-picker-launch {
@@ -860,7 +865,7 @@ button {
   color: var(--color-white);
   border-radius: var(--size-2);
   padding: var(--size-3) var(--size-10);
-  font-size: var(--font-size-12);
+  font-size: var(--type-body-size);
   cursor: pointer;
 }
 
@@ -876,7 +881,7 @@ button {
   background: var(--color-danger-surface-strong);
   border-bottom: var(--size-1) solid var(--color-danger-border);
   color: var(--color-danger);
-  font-size: var(--font-size-11);
+  font-size: var(--type-caption-size);
   padding: var(--size-4) var(--size-8);
 }
 
@@ -927,26 +932,28 @@ button {
 }
 
 .auth-eyebrow {
-  font-size: var(--font-size-11);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.08em;
+  font-family: var(--type-code-family);
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--letter-spacing-label-wide);
   text-transform: uppercase;
   color: var(--vscode-fg-muted);
   margin: 0 0 var(--size-4);
 }
 
 .auth-title {
-  font-size: var(--font-size-18);
-  font-weight: var(--font-weight-semibold);
+  font-family: var(--type-heading-family);
+  font-size: var(--type-h1-size);
+  font-weight: var(--type-heading-weight);
   margin: 0;
   color: var(--vscode-fg);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 .auth-subtitle {
   margin: var(--size-8) 0 0;
-  font-size: var(--font-size-12);
-  line-height: 1.5;
+  font-size: var(--type-body-size);
+  line-height: var(--line-height-readable);
   color: var(--vscode-fg-muted);
 }
 
@@ -962,7 +969,7 @@ button {
   border-radius: var(--size-2);
   background: var(--color-surface-tint-05);
   color: var(--vscode-fg);
-  font-size: var(--font-size-12);
+  font-size: var(--type-body-size);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: background 0.12s ease, border-color 0.12s ease;
@@ -983,9 +990,10 @@ button {
   gap: var(--size-10);
   margin: var(--size-16) 0;
   color: var(--vscode-fg-muted);
-  font-size: var(--font-size-11);
+  font-family: var(--type-code-family);
+  font-size: var(--type-caption-size);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--letter-spacing-label);
 }
 
 .auth-or::before,
@@ -1006,7 +1014,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: var(--size-4);
-  font-size: var(--font-size-11);
+  font-size: var(--type-caption-size);
   color: var(--vscode-fg-muted);
 }
 
@@ -1016,7 +1024,7 @@ button {
   border-radius: var(--size-2);
   background: var(--color-panel-hover);
   color: var(--vscode-fg);
-  font-size: var(--font-size-12);
+  font-size: var(--type-body-size);
   outline: none;
 }
 
@@ -1032,7 +1040,7 @@ button {
   border-radius: var(--size-2);
   background: var(--color-accent);
   color: var(--color-white);
-  font-size: var(--font-size-12);
+  font-size: var(--type-body-size);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
 }
@@ -1047,8 +1055,8 @@ button {
   border: var(--size-1) solid var(--color-danger-border-strong);
   background: var(--color-danger-surface);
   color: var(--color-danger);
-  font-size: var(--font-size-11);
-  line-height: 1.4;
+  font-size: var(--type-caption-size);
+  line-height: var(--line-height-body);
 }
 
 .auth-btn-ghost {
@@ -1059,7 +1067,7 @@ button {
   border-radius: var(--size-2);
   background: transparent;
   color: var(--vscode-fg-muted);
-  font-size: var(--font-size-12);
+  font-size: var(--type-body-size);
   cursor: pointer;
 }
 
@@ -1070,8 +1078,8 @@ button {
 
 .auth-hint {
   margin: var(--size-14) 0 0;
-  font-size: var(--font-size-11);
-  line-height: 1.45;
+  font-size: var(--type-caption-size);
+  line-height: var(--line-height-body);
   color: var(--vscode-fg-muted);
   opacity: 0.9;
 }

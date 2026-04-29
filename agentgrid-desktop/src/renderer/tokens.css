@@ -1,3 +1,15 @@
+@font-face {
+  font-family: "Inter";
+  src: local("Inter");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: local("JetBrains Mono");
+  font-display: swap;
+}
+
 :root {
   color-scheme: dark;
 
@@ -111,6 +123,24 @@
   --line-height-compact: 1.3;
   --line-height-body: 1.45;
   --line-height-readable: 1.5;
+  --letter-spacing-none: 0;
+  --letter-spacing-brand: 0.01em;
+  --letter-spacing-ui: 0.03em;
+  --letter-spacing-label: 0.06em;
+  --letter-spacing-label-wide: 0.08em;
+  --letter-spacing-tight: -0.02em;
+
+  --type-heading-family: var(--font-family-body);
+  --type-body-family: var(--font-family-body);
+  --type-code-family: var(--font-family-code);
+  --type-display-size: var(--font-size-22);
+  --type-h1-size: var(--font-size-18);
+  --type-body-size: var(--font-size-12);
+  --type-caption-size: var(--font-size-11);
+  --type-micro-size: var(--font-size-10);
+  --type-heading-weight: var(--font-weight-semibold);
+  --type-body-weight: var(--font-weight-regular);
+  --type-label-weight: var(--font-weight-semibold);
 
   --size-1: 1px;
   --size-2: 2px;
