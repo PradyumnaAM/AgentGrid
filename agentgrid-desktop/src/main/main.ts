@@ -42,7 +42,10 @@ import {
 import { PtyManager } from './ptyManager';
 
 const isDev = process.env.AGENTGRID_DEV === '1' || !app.isPackaged;
-const DEV_SERVER_URL = 'http://localhost:5173';
+const DEFAULT_RENDERER_DEV_URL = 'http://localhost:5173';
+const DEV_SERVER_URL = (
+  process.env.AGENTGRID_RENDERER_DEV_URL?.trim() || DEFAULT_RENDERER_DEV_URL
+).replace(/\/+$/, '');
 
 // Track the PtyManager per window so window.close() tears down the right PTYs.
 const managersByWindowId = new Map<number, PtyManager>();
