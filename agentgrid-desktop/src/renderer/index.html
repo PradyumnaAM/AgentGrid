@@ -4,159 +4,321 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; connect-src 'self' ws://localhost:5173 http://localhost:5173"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' ws://localhost:5173 http://localhost:5173"
     />
     <title>AgentGrid Desktop - Terminal Workspace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./tokens.css" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div id="auth-overlay" class="auth-overlay" role="dialog" aria-modal="true" aria-labelledby="auth-title">
-      <div class="auth-overlay-inner">
-        <div class="auth-brand">
-          <img class="auth-logo" src="./logo.png" alt="" draggable="false" aria-hidden="true" />
-          <div>
-            <p class="auth-eyebrow">AgentGrid Desktop</p>
-            <h1 id="auth-title" class="auth-title">Sign in</h1>
-            <p class="auth-subtitle">
-              Sign in through your system browser. The desktop app never embeds the website login form.
-            </p>
+    <div id="main-app" class="main-app">
+      <aside class="app-sidebar" aria-label="AgentGrid navigation">
+          <div class="sidebar-brand">
+            <img src="./logo.png" alt="" aria-hidden="true" width="30" height="30" />
+            <div>
+              <div class="sidebar-brand-name"><span>Agent</span><span class="brand-grid">Grid</span></div>
+            <div class="sidebar-brand-caption">Desktop terminal workspace</div>
+            </div>
+          </div>
+
+        <nav class="sidebar-nav" aria-label="Main navigation">
+          <div class="sidebar-group-label">Navigate</div>
+          <button type="button" class="sidebar-nav-item active" id="sidebar-home-btn" aria-selected="true">
+            <span class="sidebar-nav-icon" aria-hidden="true">▦</span>
+            Overview
+          </button>
+        </nav>
+
+        <section class="sidebar-workspace-section" aria-label="Active workspace">
+          <div class="sidebar-group-label">Active Workspace</div>
+          <div class="sidebar-workspace-list" id="sidebar-workspaces-list"></div>
+        </section>
+
+        <section class="sidebar-tools-section" aria-label="Workspace tools">
+          <div class="sidebar-group-label">Workspace Tools</div>
+          <button type="button" class="sidebar-nav-item" id="sidebar-presets-btn">
+            <span class="sidebar-nav-icon" aria-hidden="true">◫</span>
+            Presets
+          </button>
+          <div class="sidebar-presets-list" id="sidebar-presets-list" hidden></div>
+          <button type="button" class="sidebar-nav-item" id="sidebar-recent-btn">
+            <span class="sidebar-nav-icon" aria-hidden="true">◷</span>
+            Recent Workspaces
+          </button>
+          <button type="button" class="sidebar-nav-item" id="sidebar-install-btn">
+            <span class="sidebar-nav-icon" aria-hidden="true">↓</span>
+            Install Help
+          </button>
+        </section>
+
+        <div class="sidebar-footer">
+          <button type="button" class="settings-button" id="settings-button" title="Settings" aria-label="Open settings">
+            <span class="sidebar-nav-icon" aria-hidden="true">⚙</span>
+            Settings
+          </button>
+
+          <div class="sidebar-footnote">
+            <span>Desktop only</span>
+            <span>Local terminals</span>
+            <span>Codex / Claude Code / Gemini</span>
           </div>
         </div>
-        <button type="button" id="auth-google-btn" class="auth-btn-primary" aria-label="Continue with Google in browser">
-          <svg class="auth-google-icon" viewBox="0 0 24 24" aria-hidden="true" width="16" height="16">
-            <path
-              fill="var(--color-google-blue)"
-              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-            />
-            <path
-              fill="var(--color-google-green)"
-              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-            />
-            <path fill="var(--color-google-yellow)" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
-            <path
-              fill="var(--color-google-red)"
-              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-            />
-          </svg>
-          Continue with Google (browser)
-        </button>
+      </aside>
 
-        <div class="auth-or"><span>or email</span></div>
-
-        <form id="auth-email-form" class="auth-email-form">
-          <button type="submit" class="auth-btn-secondary" aria-label="Continue with email or password in browser">Continue with email/password (browser)</button>
-        </form>
-
-        <div id="auth-status" class="auth-status" role="status" hidden></div>
-
-        <button type="button" id="auth-continue-local-btn" class="auth-btn-ghost" aria-label="Continue locally without cloud sign-in">
-          Continue locally (no cloud sign-in)
-        </button>
-        <p class="auth-hint">
-          Local terminals can run without cloud sign-in. Account features use a browser handoff and OS-protected storage.
-        </p>
-      </div>
-    </div>
-
-    <div id="main-app" class="main-app" hidden>
-    <header class="app-header">
-      <div class="app-brand">
-        <img class="app-logo" src="./logo.png" alt="" aria-hidden="true" draggable="false" />
-        <span class="app-brand-name">AgentGrid</span>
-      </div>
-      <div class="app-tabs" id="app-tabs" role="tablist" aria-label="Workspace tabs"></div>
-      <div class="header-actions">
-        <span class="app-subtitle" id="status">starting...</span>
-        <button type="button" class="account-button" id="account-button">Sign in</button>
-        <div class="pane-count" id="pane-count" aria-label="Pane count" hidden></div>
-      </div>
-    </header>
-
-    <div class="tab-views" id="tab-views">
-      <section
-        id="home-panel"
-        class="tab-panel home-panel"
-        role="tabpanel"
-        aria-labelledby="tab-home"
-      >
-        <div class="home-inner">
-          <div class="home-hero">
-            <div class="home-hero-brand">
-              <img
-                class="home-hero-logo"
-                src="./logo.png"
-                alt=""
-                aria-hidden="true"
-                draggable="false"
-              />
-              <span class="home-hero-name">AgentGrid</span>
-            </div>
-            <p class="home-hero-tagline">
-              Multi-pane terminal workspaces. Each assignment opens a shell; CLI choices run their command automatically.
-            </p>
+      <div class="app-content">
+        <header class="app-header">
+          <div class="app-header-main">
+            <nav class="project-breadcrumb" aria-label="Current workspace">
+              <span>Workspace</span>
+              <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+              <strong id="header-project-folder">No folder selected</strong>
+            </nav>
           </div>
+          <div class="header-actions">
+            <span class="app-subtitle" id="status">starting...</span>
+            <div class="pane-count" id="pane-count" aria-label="Terminal count" hidden></div>
+          </div>
+        </header>
 
-          <div class="launcher-panel" id="launcher">
-            <div class="launcher-panel-header">
-              <div class="launcher-eyebrow">New workspace</div>
-              <p class="launcher-panel-intro">
-                Choose layout and slot tools. Opens in a new tab; Home stays available.
-              </p>
-            </div>
+        <div class="tab-views" id="tab-views">
+          <section
+            id="home-panel"
+            class="tab-panel home-panel"
+            role="tabpanel"
+            aria-labelledby="tab-home"
+          >
+            <div class="home-inner">
+              <div class="wizard-container">
 
-            <div class="launcher-section project-folder-section">
-              <div class="launcher-label">Project folder</div>
-              <div class="project-folder-panel" id="project-folder-panel" data-state="empty">
-                <div class="project-folder-main">
-                  <div class="project-folder-icon" aria-hidden="true">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    </svg>
+                <!-- Stepper -->
+                <div class="wizard-stepper" id="wizard-stepper">
+                  <div class="wizard-step-item" id="ws-item-1">
+                    <div class="wizard-step-circle" id="ws-circle-1">1</div>
+                    <span class="wizard-step-label">Start</span>
                   </div>
-                  <div class="project-folder-text">
-                    <div class="project-folder-path" id="project-folder-path">No folder selected</div>
-                    <div class="project-folder-hint" id="project-folder-hint">Choose a project folder before launching.</div>
+                  <div class="wizard-step-line" id="ws-line-1"></div>
+                  <div class="wizard-step-item" id="ws-item-2">
+                    <div class="wizard-step-circle" id="ws-circle-2">2</div>
+                    <span class="wizard-step-label">Layout</span>
                   </div>
-                  <button type="button" id="project-folder-browse" class="project-folder-button">
-                    Browse&hellip;
-                  </button>
+                  <div class="wizard-step-line" id="ws-line-2"></div>
+                  <div class="wizard-step-item" id="ws-item-3">
+                    <div class="wizard-step-circle" id="ws-circle-3">3</div>
+                    <span class="wizard-step-label">Agents</span>
+                  </div>
                 </div>
-                <div class="project-folder-footnote">
-                  Terminal cwd wiring is coming soon.
+
+                <!-- Step 1: Folder -->
+                <div class="wizard-pane" id="wizard-pane-1">
+                  <div class="wizard-pane-heading">
+                    <h2 class="wizard-title">Set up your workspace</h2>
+                    <p class="wizard-subtitle">Choose a working folder for your terminals.</p>
+                  </div>
+                  <div class="wizard-field-group">
+                    <div class="wizard-field-label">Working folder <span class="wizard-field-hint">Where your terminals will start</span></div>
+                    <div class="project-folder-panel" id="project-folder-panel" data-state="empty">
+                      <div class="project-folder-main">
+                        <div class="project-folder-icon" aria-hidden="true">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                          </svg>
+                        </div>
+                        <div class="project-folder-text">
+                          <div class="project-folder-path" id="project-folder-path">No folder yet</div>
+                          <div class="project-folder-hint" id="project-folder-hint">Select a project folder before launching.</div>
+                        </div>
+                        <button type="button" id="project-folder-browse" class="project-folder-button">Select folder&hellip;</button>
+                      </div>
+                      <div class="project-folder-footnote">Sets the working directory for every terminal.</div>
+                    </div>
+                  </div>
+                  <div class="launcher-section cli-health-section" id="cli-health-section">
+                    <div class="cli-health-summary" id="cli-health-summary">Checking local tools.</div>
+                    <div class="cli-health-list" id="cli-health-list" hidden></div>
+                  </div>
                 </div>
+
+                <!-- Step 2: Layout -->
+                <div class="wizard-pane" id="wizard-pane-2" hidden>
+                  <div class="wizard-pane-heading">
+                    <h2 class="wizard-title">Set up your workspace</h2>
+                    <p class="wizard-subtitle">Pick a folder to work in and choose how many terminals you want.</p>
+                  </div>
+                  <div class="wizard-field-group">
+                    <div class="wizard-field-label">Working folder <span class="wizard-field-hint">Where your terminals will start</span></div>
+                    <div class="wizard-folder-display" id="wizard-folder-display">
+                      <span class="wizard-folder-path" id="wizard-folder-path">No folder selected</span>
+                      <button type="button" class="wizard-folder-change-btn" id="wizard-folder-change-btn">Change&hellip;</button>
+                    </div>
+                  </div>
+                  <div class="wizard-field-group">
+                    <div class="wizard-terminals-header">
+                      <div class="wizard-field-label">How many terminals? <span class="wizard-field-hint">Tap a tile to choose a layout</span></div>
+                      <div class="wizard-terminals-badge" id="wizard-terminals-badge">1 terminal &middot; 1&times;1 grid</div>
+                    </div>
+                    <div class="wizard-tile-grid" id="wizard-tile-grid"></div>
+                  </div>
+                  <div class="wizard-field-group">
+                    <div class="wizard-field-label">Default agent <span class="wizard-field-hint">Applied to all terminals unless overridden in step 3</span></div>
+                    <div id="launcher-bulk-agent"></div>
+                  </div>
+                  <div class="wizard-presets-row">
+                    <span class="wizard-presets-label">&#9647; PRESETS</span>
+                    <button type="button" class="wizard-save-preset-btn" id="wizard-save-preset-btn">+ Save current setup as a preset</button>
+                  </div>
+                  <!-- hidden compat elements -->
+                  <div id="launcher-pane-count" hidden></div>
+                </div>
+
+                <!-- Step 3: Agents -->
+                <div class="wizard-pane" id="wizard-pane-3" hidden>
+                  <div class="wizard-pane-heading">
+                    <h2 class="wizard-title">Assign AI agents</h2>
+                    <p class="wizard-subtitle">Choose which CLI runs in each terminal, or keep the default.</p>
+                  </div>
+                  <div class="pane-assignments" id="launcher-assignments"></div>
+                  <div class="install-notice-banner wizard-install-notice">
+                    <span class="install-notice-icon" aria-hidden="true">&#9888;</span>
+                    <div class="install-notice-content">
+                      <div class="install-notice-title">CLIs must be installed locally</div>
+                      <div class="install-notice-desc">AgentGrid launches Codex, Claude Code, and Gemini from your machine. Empty Terminal opens a normal shell.</div>
+                    </div>
+                    <button type="button" class="install-notice-button" id="install-notice-view-btn">View install instructions</button>
+                  </div>
+                </div>
+
+                <!-- Hidden summary elements kept for JS compat -->
+                <div hidden>
+                  <span id="summary-workspace"></span>
+                  <span id="summary-terminal-count"></span>
+                  <span id="summary-universal-agent"></span>
+                  <div id="summary-agents-list"></div>
+                  <button id="summary-launch-btn"></button>
+                  <div id="launcher"></div>
+                </div>
+
+                <!-- Wizard footer -->
+                <div class="wizard-footer" id="wizard-footer">
+                  <button type="button" class="wizard-btn wizard-btn-ghost" id="wizard-back-btn" hidden>&#8592; Back</button>
+                  <div class="wizard-footer-right">
+                    <button type="button" class="wizard-btn wizard-btn-plain" id="wizard-open-plain-btn" hidden>Open without AI</button>
+                    <button type="button" class="wizard-btn wizard-btn-primary" id="wizard-next-btn">Next: Choose layout &#8594;</button>
+                  </div>
+                </div>
+
               </div>
             </div>
+          </section>
 
-            <div class="launcher-section">
-              <div class="launcher-label">Panes</div>
-              <div class="pane-count-selector" id="launcher-pane-count" role="radiogroup" aria-label="Pane count"></div>
+          <div id="workspace-mount" class="workspace-mount"></div>
+        </div>
+      </div>
+
+      <div id="settings-panel" class="settings-panel" hidden>
+        <div class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+          <div class="settings-header">
+            <div>
+              <h2 id="settings-title">Settings</h2>
+              <p>Adjust terminal defaults and workspace preferences.</p>
             </div>
-
-            <div class="launcher-section">
-              <div class="launcher-label">Slots</div>
-              <div class="pane-assignments" id="launcher-assignments"></div>
+            <button type="button" id="settings-close" class="settings-close" aria-label="Close settings">&times;</button>
+          </div>
+          <div class="settings-grid">
+            <label class="settings-field">
+              <span>Terminal font size</span>
+              <input type="number" id="settings-font-size" min="8" max="40" step="1" />
+            </label>
+            <label class="settings-field">
+              <span>Terminal font family</span>
+              <input type="text" id="settings-font-family" />
+            </label>
+            <label class="settings-check">
+              <input type="checkbox" id="settings-copy-on-select" />
+              <span>Copy terminal selection automatically</span>
+            </label>
+            <label class="settings-check">
+              <input type="checkbox" id="settings-paste-confirm" />
+              <span>Confirm large paste operations</span>
+            </label>
+            <div class="settings-field settings-readonly">
+              <span>Shell mode</span>
+              <strong id="settings-shell-mode">Native shell</strong>
             </div>
-
-            <div class="launcher-actions">
-              <button type="button" id="launch-button" class="primary-button">
-                <span class="primary-button-label">Start workspace</span>
-              </button>
-              <span class="launcher-actions-hint">Opens a new workspace tab.</span>
+            <div class="settings-field settings-readonly">
+              <span>Default folder</span>
+              <strong id="settings-default-folder">No folder selected</strong>
             </div>
           </div>
-
-          <div class="open-workspaces" id="open-workspaces" hidden>
-            <div class="launcher-label">Open</div>
-            <div class="open-workspaces-list" id="open-workspaces-list"></div>
+          <div class="settings-cli-paths" hidden>
+            <div class="launcher-label">CLI paths</div>
+            <div id="settings-cli-paths-list" class="settings-cli-paths-list"></div>
+          </div>
+          <div class="settings-shortcuts">
+            <div class="launcher-label">Shortcuts</div>
+            <div class="settings-shortcuts-list">
+              <span>Ctrl/Cmd+N New workspace</span>
+              <span>Ctrl/Cmd+W Close workspace</span>
+              <span>Ctrl/Cmd+Tab Switch tab</span>
+              <span>Ctrl/Cmd+Shift+P Focus next terminal</span>
+              <span>Ctrl/Cmd+Plus/Minus Change terminals</span>
+              <span>Ctrl/Cmd+H Home</span>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      <div id="workspace-mount" class="workspace-mount"></div>
-    </div>
+      <dialog id="install-instructions-dialog" class="install-instructions-dialog" aria-labelledby="install-instructions-title">
+        <div class="install-instructions-inner">
+          <div class="install-instructions-header">
+            <h3 id="install-instructions-title" class="install-instructions-title">Install CLIs</h3>
+            <p class="install-instructions-sub">Run the command for each CLI you want to use. Requires Node.js 18+ (or Homebrew on macOS).</p>
+            <button type="button" id="install-instructions-close" class="install-instructions-close" aria-label="Close">&times;</button>
+          </div>
+          <div class="install-instructions-list">
+            <div class="install-cli-block">
+              <div class="install-cli-name">Codex <span class="install-cli-tag">OpenAI</span></div>
+              <div class="install-cli-row">
+                <code class="install-cli-cmd" id="install-cmd-codex">npm install -g @openai/codex</code>
+                <button type="button" class="install-copy-btn" data-target="install-cmd-codex">Copy</button>
+              </div>
+            </div>
+            <div class="install-cli-block">
+              <div class="install-cli-name">Claude Code <span class="install-cli-tag">Anthropic</span></div>
+              <div class="install-cli-row">
+                <code class="install-cli-cmd" id="install-cmd-claude">npm install -g @anthropic-ai/claude-code</code>
+                <button type="button" class="install-copy-btn" data-target="install-cmd-claude">Copy</button>
+              </div>
+            </div>
+            <div class="install-cli-block">
+              <div class="install-cli-name">Gemini <span class="install-cli-tag">Google</span></div>
+              <div class="install-cli-row">
+                <code class="install-cli-cmd" id="install-cmd-gemini">npm install -g @google/gemini-cli</code>
+                <button type="button" class="install-copy-btn" data-target="install-cmd-gemini">Copy</button>
+              </div>
+            </div>
+          </div>
+          <p class="install-instructions-note">After installing, restart AgentGrid or click "Check again" in the System Health section.</p>
+        </div>
+      </dialog>
 
-    <script type="module" src="./main.ts"></script>
+      <dialog id="preset-name-dialog" class="preset-name-dialog" aria-labelledby="preset-name-title">
+        <form method="dialog" class="preset-name-form">
+          <h3 id="preset-name-title" class="preset-name-title">Save Preset</h3>
+          <label class="preset-name-label" for="preset-name-input">Name</label>
+          <input type="text" id="preset-name-input" class="preset-name-input" maxlength="80" autocomplete="off" />
+          <div class="preset-name-actions">
+            <button type="button" id="preset-name-cancel" class="preset-name-btn preset-name-btn-ghost">Cancel</button>
+            <button type="submit" id="preset-name-save" class="preset-name-btn preset-name-btn-primary">Save</button>
+          </div>
+        </form>
+      </dialog>
+
+      <script type="module" src="./main.ts"></script>
     </div>
   </body>
 </html>

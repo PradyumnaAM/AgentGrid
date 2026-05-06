@@ -27,6 +27,7 @@ const recordsByWindowId = new Map<number, InstallRecord>();
 export async function openInstallWindow(args: {
   kind: CliKind;
   opener: BrowserWindow;
+  iconPath: string;
   preloadPath: string;
   devUrl: string | null;
   registerManager: (win: BrowserWindow, manager: PtyManager) => void;
@@ -51,6 +52,7 @@ export async function openInstallWindow(args: {
     minWidth: 640,
     minHeight: 420,
     title: `Install ${args.kind}`,
+    icon: args.iconPath,
     parent: args.opener,
     modal: false,
     show: false,
@@ -143,7 +145,7 @@ export async function finishInstallForEvent(event: IpcMainInvokeEvent, exitCode:
 }
 
 async function createWindowsInstallScript(kind: CliKind, displayCommand: string, markerPath: string): Promise<string> {
-  const spec = windowsInstallSpec(kind);
+  const spec = await windowsInstallSpec(kind);
   const scriptPath = path.join(os.tmpdir(), `agentgrid-cli-install-${randomUUID()}.ps1`);
   const script = [
     '$ErrorActionPreference = "Continue"',
@@ -171,15 +173,36 @@ async function createWindowsInstallScript(kind: CliKind, displayCommand: string,
   return scriptPath;
 }
 
-function windowsInstallSpec(kind: CliKind): { exe: string; args: string[] } {
+async function windowsInstallSpec(kind: CliKind): Promise<{ exe: string; args: string[] }> {
+  const npm = await resolveWindowsNpmCommand();
   switch (kind) {
     case 'codex':
-      return { exe: 'npm.cmd', args: ['install', '-g', '@openai/codex'] };
+      return { exe: npm, args: ['install', '-g', '@openai/codex'] };
     case 'claude':
-      return { exe: 'npm.cmd', args: ['install', '-g', '@anthropic-ai/claude-code'] };
+      return { exe: npm, args: ['install', '-g', '@anthropic-ai/claude-code'] };
     case 'gemini':
-      return { exe: 'npm.cmd', args: ['install', '-g', '@google/gemini-cli'] };
+      return { exe: npm, args: ['install', '-g', '@google/gemini-cli'] };
   }
+}
+
+async function resolveWindowsNpmCommand(): Promise<string> {
+  const candidates = [
+    process.env.APPDATA ? path.join(process.env.APPDATA, 'npm', 'npm.cmd') : null,
+    process.env.ProgramFiles ? path.join(process.env.ProgramFiles, 'nodejs', 'npm.cmd') : null,
+    process.env['ProgramFiles(x86)'] ? path.join(process.env['ProgramFiles(x86)'], 'nodejs', 'npm.cmd') : null,
+    'npm.cmd',
+  ].filter((item): item is string => Boolean(item));
+
+  for (const candidate of candidates) {
+    if (candidate === 'npm.cmd') return candidate;
+    try {
+      const stat = await fs.stat(candidate);
+      if (stat.isFile()) return candidate;
+    } catch {
+      // Try the next common npm location.
+    }
+  }
+  return 'npm.cmd';
 }
 
 function psString(value: string): string {

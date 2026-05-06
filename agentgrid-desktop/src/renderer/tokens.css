@@ -1,47 +1,21 @@
-@font-face {
-  font-family: "Inter";
-  src: local("Inter");
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  src: local("JetBrains Mono");
-  font-display: swap;
-}
-
 :root {
   color-scheme: dark;
 
-  /* Stitch source: imported/agentgrid-terminal-workspace/design-systems/agentgrid-pro.md */
-  --color-agent-surface: #0b1326;
-  --color-agent-surface-lowest: #060e20;
-  --color-agent-surface-low: #131b2e;
-  --color-agent-surface-container: #171f33;
-  --color-agent-surface-high: #222a3d;
-  --color-agent-surface-highest: #2d3449;
-  --color-agent-on-surface: #dae2fd;
-  --color-agent-on-surface-muted: #c3c6d7;
-  --color-agent-primary: #b4c5ff;
-  --color-agent-primary-container: #2563eb;
-  --color-agent-secondary: #ffb690;
-  --color-agent-secondary-container: #ec6a06;
-  --color-agent-tertiary: #4edea3;
-  --color-agent-error: #ffb4ab;
-
-  /* Stitch source: imported/agentgrid-terminal-workspace/design-systems/obsidian-glow.md */
-  --color-obsidian-surface: #131313;
-  --color-obsidian-surface-lowest: #0e0e0e;
-  --color-obsidian-surface-low: #1c1b1b;
-  --color-obsidian-surface-container: #201f1f;
-  --color-obsidian-surface-high: #2a2a2a;
-  --color-obsidian-surface-highest: #353534;
-  --color-obsidian-on-surface: #e5e2e1;
-  --color-obsidian-on-surface-muted: #d8c3ad;
-  --color-obsidian-primary: #ffc174;
-  --color-obsidian-primary-container: #f59e0b;
-  --color-obsidian-secondary: #ffb77d;
-  --color-obsidian-secondary-container: #d97707;
+  /* AgentGrid Command Center: charcoal base, gold primary, green status */
+  --color-agent-surface: #080A0D;
+  --color-agent-surface-lowest: #050608;
+  --color-agent-surface-low: #0D1117;
+  --color-agent-surface-container: #11161D;
+  --color-agent-surface-high: #1A2030;
+  --color-agent-surface-highest: #232A33;
+  --color-agent-on-surface: #F8FAFC;
+  --color-agent-on-surface-muted: #AAB2C0;
+  --color-agent-primary: #FFC107;
+  --color-agent-primary-container: #FFD23F;
+  --color-agent-secondary: #22C55E;
+  --color-agent-secondary-container: #0F3D24;
+  --color-agent-tertiary: #7CFF6B;
+  --color-agent-error: #EF4444;
 
   --color-bg: var(--color-agent-surface-lowest);
   --color-shell: var(--color-agent-surface);
@@ -52,13 +26,13 @@
   --color-text-muted: var(--color-agent-on-surface-muted);
   --color-accent: var(--color-agent-primary-container);
   --color-accent-soft: var(--color-agent-primary);
-  --color-warning: var(--color-agent-secondary-container);
+  --color-warning: #F59E0B;
   --color-secondary: var(--color-agent-secondary);
-  --color-success: var(--color-agent-tertiary);
+  --color-success: var(--color-agent-secondary);
   --color-danger: var(--color-agent-error);
-  --color-terminal-bg: var(--color-agent-surface-lowest);
-  --color-terminal-fg: var(--color-agent-on-surface);
-  --color-terminal-cursor: var(--color-agent-primary);
+  --color-terminal-bg: #070A0E;
+  --color-terminal-fg: #D1D5DB;
+  --color-terminal-cursor: var(--color-agent-primary-container);
   --color-transparent: transparent;
   --color-white: #ffffff;
   --color-black: #000000;
@@ -67,43 +41,44 @@
   --color-google-yellow: #fbbc05;
   --color-google-red: #ea4335;
 
-  --color-border: rgba(180, 197, 255, 0.16);
-  --color-border-muted: rgba(180, 197, 255, 0.08);
-  --color-border-strong: rgba(180, 197, 255, 0.35);
-  --color-focus-ring: rgba(37, 99, 235, 0.45);
-  --color-focus-ring-strong: rgba(37, 99, 235, 0.55);
-  --color-selection: rgba(37, 99, 235, 0.35);
-  --color-accent-surface: rgba(37, 99, 235, 0.15);
-  --color-accent-surface-strong: rgba(37, 99, 235, 0.25);
-  --color-surface-tint-03: rgba(180, 197, 255, 0.03);
-  --color-surface-tint-04: rgba(180, 197, 255, 0.04);
-  --color-surface-tint-05: rgba(180, 197, 255, 0.05);
-  --color-surface-tint-06: rgba(180, 197, 255, 0.06);
-  --color-surface-tint-07: rgba(180, 197, 255, 0.07);
-  --color-surface-tint-08: rgba(180, 197, 255, 0.08);
-  --color-surface-tint-09: rgba(180, 197, 255, 0.09);
-  --color-surface-tint-10: rgba(180, 197, 255, 0.1);
-  --color-surface-tint-16: rgba(180, 197, 255, 0.16);
-  --color-surface-tint-18: rgba(180, 197, 255, 0.18);
-  --color-surface-tint-26: rgba(180, 197, 255, 0.26);
-  --color-backdrop-soft: rgba(6, 14, 32, 0.92);
-  --color-backdrop-strong: rgba(6, 14, 32, 0.95);
+  --color-border: #232A33;
+  --color-border-muted: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 210, 63, 0.55);
+  --color-focus-ring: rgba(255, 210, 63, 0.32);
+  --color-focus-ring-strong: rgba(255, 210, 63, 0.56);
+  --color-selection: rgba(255, 210, 63, 0.22);
+  --color-accent-surface: rgba(255, 210, 63, 0.10);
+  --color-accent-surface-strong: rgba(255, 210, 63, 0.18);
+  --color-surface-tint-03: rgba(255, 255, 255, 0.03);
+  --color-surface-tint-04: rgba(255, 255, 255, 0.04);
+  --color-surface-tint-05: rgba(255, 255, 255, 0.05);
+  --color-surface-tint-06: rgba(255, 255, 255, 0.06);
+  --color-surface-tint-07: rgba(255, 255, 255, 0.07);
+  --color-surface-tint-08: rgba(255, 255, 255, 0.08);
+  --color-surface-tint-09: rgba(255, 255, 255, 0.09);
+  --color-surface-tint-10: rgba(255, 255, 255, 0.10);
+  --color-surface-tint-16: rgba(255, 255, 255, 0.16);
+  --color-surface-tint-18: rgba(255, 255, 255, 0.18);
+  --color-surface-tint-26: rgba(255, 255, 255, 0.26);
+  --color-backdrop-soft: rgba(5, 6, 8, 0.92);
+  --color-backdrop-strong: rgba(5, 6, 8, 0.96);
   --color-overlay-12: rgba(0, 0, 0, 0.12);
   --color-overlay-15: rgba(0, 0, 0, 0.15);
   --color-overlay-20: rgba(0, 0, 0, 0.2);
   --color-overlay-40: rgba(0, 0, 0, 0.4);
   --color-overlay-55: rgba(0, 0, 0, 0.55);
-  --color-success-surface: rgba(78, 222, 163, 0.12);
-  --color-success-border: rgba(78, 222, 163, 0.28);
-  --color-success-border-strong: rgba(78, 222, 163, 0.35);
-  --color-danger-surface: rgba(255, 180, 171, 0.1);
-  --color-danger-surface-strong: rgba(255, 180, 171, 0.12);
-  --color-danger-border: rgba(255, 180, 171, 0.35);
-  --color-danger-border-strong: rgba(255, 180, 171, 0.45);
-  --color-warning-border: rgba(236, 106, 6, 0.4);
+  --color-success-surface: rgba(34, 197, 94, 0.10);
+  --color-success-border: rgba(34, 197, 94, 0.32);
+  --color-success-border-strong: rgba(34, 197, 94, 0.42);
+  --color-danger-surface: rgba(239, 68, 68, 0.08);
+  --color-danger-surface-strong: rgba(239, 68, 68, 0.12);
+  --color-danger-border: rgba(239, 68, 68, 0.28);
+  --color-danger-border-strong: rgba(239, 68, 68, 0.42);
+  --color-warning-border: rgba(245, 158, 11, 0.4);
 
-  --font-family-body: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --font-family-code: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", Consolas, "Liberation Mono", monospace;
+  --font-family-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-family-display: "Inter", ui-sans-serif, sans-serif;
+  --font-family-code: "JetBrains Mono", ui-monospace, monospace;
   --font-family-inherit: inherit;
   --font-size-10: 10px;
   --font-size-11: 11px;
@@ -124,13 +99,13 @@
   --line-height-body: 1.45;
   --line-height-readable: 1.5;
   --letter-spacing-none: 0;
-  --letter-spacing-brand: 0.01em;
-  --letter-spacing-ui: 0.03em;
-  --letter-spacing-label: 0.06em;
-  --letter-spacing-label-wide: 0.08em;
-  --letter-spacing-tight: -0.02em;
+  --letter-spacing-brand: 0;
+  --letter-spacing-ui: 0;
+  --letter-spacing-label: 0;
+  --letter-spacing-label-wide: 0;
+  --letter-spacing-tight: 0;
 
-  --type-heading-family: var(--font-family-body);
+  --type-heading-family: var(--font-family-display);
   --type-body-family: var(--font-family-body);
   --type-code-family: var(--font-family-code);
   --type-display-size: var(--font-size-22);
