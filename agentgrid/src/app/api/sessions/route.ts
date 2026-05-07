@@ -16,7 +16,7 @@ export async function GET() {
       take: 50,
     });
 
-    const sessions = rows.map((r) => ({
+    const sessions = rows.map((r: typeof rows[number]) => ({
       id: r.id,
       name: r.name,
       agents: JSON.parse(r.agentsJson),

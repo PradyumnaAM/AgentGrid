@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json({
-      logs: logs.map((l) => ({
+      logs: logs.map((l: typeof logs[number]) => ({
         id: l.id,
         timestamp: l.timestamp.getTime(),
         agentId: l.agentId,
