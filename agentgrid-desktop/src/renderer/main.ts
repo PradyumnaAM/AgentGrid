@@ -15,6 +15,7 @@ import type {
 import type { CliDetectionResult, CliDetectionStatus, CliKind } from '../shared/cli';
 import {
   DEFAULT_APP_STATE,
+  type ApprovalSettings,
   type AppStatePatch,
   type PersistedAppState,
   type RecentWorkspaceEntry,
@@ -27,7 +28,15 @@ import {
   type AgentMondayRoute,
   type AgentMondayRoutePlan,
 } from '../shared/assistant';
-import type { BrowserPreviewBounds, BrowserPreviewStateEvent } from '../shared/ipc';
+import type {
+  ApprovalAction,
+  ApprovalQueueItemStatus,
+  ApprovalResolveMode,
+  ApprovalResolvedEvent,
+  BrowserPreviewBounds,
+  BrowserPreviewStateEvent,
+  TerminalApprovalRequestEvent,
+} from '../shared/ipc';
 
 // â”€â”€â”€ DOM lookup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -82,18 +91,23 @@ const installInstructionsDialogEl = document.getElementById('install-instruction
 const installInstructionsCloseEl = document.getElementById('install-instructions-close') as HTMLButtonElement | null;
 const installNoticeBtnEl = document.getElementById('install-notice-view-btn') as HTMLButtonElement | null;
 const sidebarInstallBtnEl = document.getElementById('sidebar-install-btn') as HTMLButtonElement | null;
+const sidebarToggleBtnEl = document.getElementById('sidebar-toggle') as HTMLButtonElement | null;
+const appSidebarEl = document.querySelector('.app-sidebar') as HTMLElement | null;
 
-const wizardPane1El = document.getElementById('wizard-pane-1') as HTMLElement | null;
-const wizardPane2El = document.getElementById('wizard-pane-2') as HTMLElement | null;
-const wizardPane3El = document.getElementById('wizard-pane-3') as HTMLElement | null;
-const wizardBackBtnEl = document.getElementById('wizard-back-btn') as HTMLButtonElement | null;
-const wizardNextBtnEl = document.getElementById('wizard-next-btn') as HTMLButtonElement | null;
-const wizardOpenPlainBtnEl = document.getElementById('wizard-open-plain-btn') as HTMLButtonElement | null;
 const wizardTileGridEl = document.getElementById('wizard-tile-grid') as HTMLElement | null;
 const wizardTerminalsBadgeEl = document.getElementById('wizard-terminals-badge') as HTMLElement | null;
-const wizardFolderPathEl = document.getElementById('wizard-folder-path') as HTMLElement | null;
-const wizardFolderChangeBtnEl = document.getElementById('wizard-folder-change-btn') as HTMLButtonElement | null;
+const wizardUniversalAgentEl = document.getElementById('wizard-universal-agent-wrap') as HTMLElement | null;
 const wizardSavePresetBtnEl = document.getElementById('wizard-save-preset-btn') as HTMLButtonElement | null;
+const headerLaunchBtnEl = document.getElementById('header-launch-btn') as HTMLButtonElement | null;
+const setupPane1El = document.getElementById('wizard-pane-1') as HTMLElement | null;
+const setupPane2El = document.getElementById('wizard-pane-2') as HTMLElement | null;
+const setupNextBtnEl = document.getElementById('setup-next-btn') as HTMLButtonElement | null;
+const setupBackBtnEl = document.getElementById('setup-back-btn') as HTMLButtonElement | null;
+const setupLaunchBtnEl = document.getElementById('setup-launch-btn') as HTMLButtonElement | null;
+const ssItem1El = document.getElementById('ss-item-1') as HTMLElement | null;
+const ssItem2El = document.getElementById('ss-item-2') as HTMLElement | null;
+const ssCircle1El = document.getElementById('ss-circle-1') as HTMLElement | null;
+const ssLine1El = document.getElementById('ss-line-1') as HTMLElement | null;
 
 const agentMondayPanelEl = document.getElementById('agent-monday-panel') as HTMLElement | null;
 const agentMondayStateEl = document.getElementById('agent-monday-state') as HTMLElement | null;
@@ -109,7 +123,7 @@ if (!sidebarHomeBtnEl) throw new Error('sidebar-home-btn element missing');
 if (!tabViewsEl) throw new Error('tab-views element missing');
 if (!workspaceMountEl) throw new Error('workspace-mount element missing');
 if (!homePanelEl) throw new Error('home-panel element missing');
-if (!paneCountEl) throw new Error('pane-count element missing');
+// pane-count lives in the compat hidden div; null-safe throughout
 if (!launcherEl) throw new Error('launcher element missing');
 if (!launcherPaneCountEl) throw new Error('launcher-pane-count element missing');
 if (!launcherBulkAgentEl) throw new Error('launcher-bulk-agent element missing');
@@ -161,8 +175,8 @@ const CLI_AUTOCOMMAND: Record<PaneAssignment, string | null> = {
 
 const AUTOCOMMAND_DELAY_MS = 350;
 const PANE_COUNT_MIN = 1;
-const LAUNCHER_PANE_COUNT_MAX = 10;
-const WORKSPACE_PANE_COUNT_MAX = 10;
+const LAUNCHER_PANE_COUNT_MAX = 12;
+const WORKSPACE_PANE_COUNT_MAX = 12;
 const DEFAULT_TERMINAL_COLS = 80;
 const DEFAULT_TERMINAL_ROWS = 24;
 const TERMINAL_SCROLLBACK_LINES = 5000;
@@ -171,6 +185,7 @@ const BROWSER_MIN_WIDTH = 360;
 const BROWSER_MAX_WIDTH = 720;
 const TERMINAL_MIN_WIDTH_WITH_BROWSER = 320;
 const BROWSER_PLACEHOLDER_URL = 'http://localhost:3000';
+const AUTO_APPROVAL_DELAY_MS = 4000;
 
 function resolveContextForAssignment(_assignment: PaneAssignment): PaneLaunchContext {
   return 'native';
@@ -238,7 +253,6 @@ const ENTRANCE_DURATION_S = 0.7;
 const CONDITIONAL_ENTER_DURATION_S = 0.3;
 const CONDITIONAL_EXIT_DURATION_S = 0.2;
 const HOVER_TRANSFORM = 'translateY(-7px) scale(1.018)';
-const BUTTON_HOVER_TRANSFORM = 'scale(1.05)';
 const BUTTON_TAP_TRANSFORM = 'scale(0.97)';
 const MOTION_REST_TRANSFORM = 'translateY(0px) scale(1)';
 const FILTER_CLEAR = 'blur(0px)';
@@ -1170,7 +1184,7 @@ class TerminalPaneController {
     this.focus();
 
     const autoCmd = CLI_AUTOCOMMAND[this.pane.assignment];
-    if (autoCmd && !restarting) {
+    if (autoCmd) {
       setTimeout(() => {
         if (this.ptyId && !this.exited) {
           void window.agentgridPty.write(this.ptyId, `${autoCmd}\r`);
@@ -1183,8 +1197,10 @@ class TerminalPaneController {
     const pane = this.store.snapshot.panes.find((item) => item.id === this.pane.id);
     if (!pane) return;
     this.store.updatePane(this.pane.id, { restartCount: pane.restartCount + 1 });
-    if (this.ptyId && !this.exited) {
-      await window.agentgridPty.kill(this.ptyId);
+    const oldPtyId = this.ptyId;
+    if (oldPtyId && !this.exited) {
+      this.ptyId = null;
+      await window.agentgridPty.kill(oldPtyId);
     }
     this.term.clear();
     await this.spawn(true);
@@ -1683,7 +1699,7 @@ function createBrowserShell(workspaceId: string): BrowserShellElements {
   );
   const railNote = document.createElement('div');
   railNote.className = 'workspace-rail-note';
-  railNote.textContent = 'Local terminals only. No browser shell.';
+  railNote.textContent = 'Terminal links open in the preview panel.';
   railEl.append(railHeading, railList, railNote);
 
   const workspacePaneEl = document.createElement('section');
@@ -1706,33 +1722,13 @@ function createBrowserShell(workspaceId: string): BrowserShellElements {
   approvalCountEl.textContent = '0';
   approvalHeader.append(approvalHeaderTitle, approvalCountEl);
 
-  const approvalTabs = document.createElement('div');
-  approvalTabs.className = 'workspace-approval-tabs';
-  for (const label of ['All', 'Code', 'Config']) {
-    const tab = document.createElement('button');
-    tab.type = 'button';
-    tab.className = `workspace-approval-tab${label === 'All' ? ' active' : ''}`;
-    tab.textContent = label;
-    approvalTabs.append(tab);
-  }
-
   const approvalListEl = document.createElement('div');
   approvalListEl.className = 'workspace-approval-list';
-  approvalListEl.append(
-    approvalPlaceholderCard('No pending approvals', 'Commands that need review will appear here.'),
-    approvalPlaceholderCard('Auto-approve is off', 'All approval actions stay explicit.'),
-  );
+  approvalListEl.append(approvalEmptyState());
 
   const approvalFooterEl = document.createElement('div');
   approvalFooterEl.className = 'workspace-approval-footer';
-  const approvalFooterText = document.createElement('span');
-  approvalFooterText.textContent = 'Auto-approve: Off';
-  const approvalManage = document.createElement('button');
-  approvalManage.type = 'button';
-  approvalManage.className = 'workspace-approval-manage';
-  approvalManage.textContent = 'Manage Rules';
-  approvalFooterEl.append(approvalFooterText, approvalManage);
-  approvalPanelEl.append(approvalHeader, approvalTabs, approvalListEl, approvalFooterEl);
+  approvalPanelEl.append(approvalHeader, approvalListEl, approvalFooterEl);
 
   shellBodyEl.append(railEl, workspacePaneEl, approvalPanelEl);
 
@@ -1752,7 +1748,7 @@ function createBrowserShell(workspaceId: string): BrowserShellElements {
   statusAgentEl.textContent = 'Universal agent: Empty Terminal';
   const statusAutoApproveEl = document.createElement('span');
   statusAutoApproveEl.className = 'workspace-statusbar-item';
-  statusAutoApproveEl.textContent = 'Auto-approve: Off';
+  statusAutoApproveEl.textContent = 'Auto Approval: Off';
   const statusHealthEl = document.createElement('span');
   statusHealthEl.className = 'workspace-statusbar-item';
   statusHealthEl.textContent = 'Local workspace ready';
@@ -1765,7 +1761,13 @@ function createBrowserShell(workspaceId: string): BrowserShellElements {
     statusHealthEl,
   );
 
-  shellEl.append(topBarEl, shellBodyEl, statusBarEl);
+  // Detach topBarEl — the whole top band is removed; elements remain for JS refs
+  topBarNewTerminalEl.className = 'workspace-statusbar-add-terminal';
+  topBarSavePresetEl.className = 'workspace-statusbar-save-preset';
+  const statusBarSpacer = document.createElement('span');
+  statusBarSpacer.className = 'workspace-statusbar-spacer';
+  statusBarEl.append(statusBarSpacer, topBarNewTerminalEl, topBarSavePresetEl);
+  shellEl.append(shellBodyEl, statusBarEl);
 
   const splitterEl = document.createElement('div');
   splitterEl.className = 'workspace-browser-splitter';
@@ -1869,17 +1871,18 @@ function railButton(label: string, active = false): HTMLButtonElement {
   return button;
 }
 
-function approvalPlaceholderCard(title: string, body: string): HTMLElement {
-  const card = document.createElement('div');
-  card.className = 'workspace-approval-card workspace-approval-placeholder';
-  const cardTitle = document.createElement('div');
-  cardTitle.className = 'workspace-approval-card-title';
-  cardTitle.textContent = title;
-  const cardBody = document.createElement('div');
-  cardBody.className = 'workspace-approval-card-body';
-  cardBody.textContent = body;
-  card.append(cardTitle, cardBody);
-  return card;
+
+function approvalEmptyState(): HTMLElement {
+  const el = document.createElement('div');
+  el.className = 'workspace-approval-empty';
+  const title = document.createElement('div');
+  title.className = 'workspace-approval-empty-title';
+  title.textContent = 'No pending approvals';
+  const body = document.createElement('div');
+  body.className = 'workspace-approval-empty-body';
+  body.textContent = 'Agent requests requiring review will appear here.';
+  el.append(title, body);
+  return el;
 }
 
 function browserButton(label: string, text: string): HTMLButtonElement {
@@ -1890,6 +1893,14 @@ function browserButton(label: string, text: string): HTMLButtonElement {
   button.title = label;
   button.setAttribute('aria-label', label);
   return button;
+}
+
+interface ApprovalQueueItem extends TerminalApprovalRequestEvent {
+  status: ApprovalQueueItemStatus;
+  terminalNumber: number;
+  enqueuedAt: number;
+  resolvedAt: number | null;
+  countdownEndsAt: number | null;
 }
 
 class WorkspaceTab implements TabBase {
@@ -1926,6 +1937,11 @@ class WorkspaceTab implements TabBase {
   private readonly store: WorkspaceStore;
   private readonly controllers = new Map<string, TerminalPaneController>();
   private readonly browser: WorkspaceBrowserController;
+  private readonly approvalItems: ApprovalQueueItem[] = [];
+  private readonly approvalCountdownTimers = new Map<string, number>();
+  private readonly approvalRemovalTimers = new Map<string, number>();
+  private approvalRequestOff: (() => void) | null = null;
+  private approvalResolvedOff: (() => void) | null = null;
   private readonly pendingPickIds = new Set<string>();
   private isClosingPane = false;
   private isClosing = false;
@@ -1998,6 +2014,7 @@ class WorkspaceTab implements TabBase {
     }
 
     this.bindWorkspaceChrome();
+    this.bindApprovalEvents();
     this.renderWorkspaceChrome();
   }
 
@@ -2032,6 +2049,16 @@ class WorkspaceTab implements TabBase {
 
   get errorPaneCount(): number {
     return this.store.snapshot.panes.filter((p) => p.status === 'error').length;
+  }
+
+  refreshApprovalQueue(): void {
+    if (approvalSettings.autoApprovalEnabled) {
+      this.startPendingAutoApprovalCountdowns();
+    } else {
+      this.stopAllAutoApprovalCountdowns();
+    }
+    this.renderApprovalQueue();
+    this.statusAutoApproveEl.textContent = `Auto Approval: ${approvalSettings.autoApprovalEnabled ? 'On' : 'Off'}`;
   }
 
   focusNextPane(offset = 1): void {
@@ -2074,13 +2101,22 @@ class WorkspaceTab implements TabBase {
     });
   }
 
+  private bindApprovalEvents(): void {
+    this.approvalRequestOff = window.agentgridPty.onApprovalRequest((evt) => {
+      this.handleApprovalRequest(evt);
+    });
+    this.approvalResolvedOff = window.agentgridPty.onApprovalResolved((evt) => {
+      this.handleApprovalResolved(evt);
+    });
+  }
+
   private renderWorkspaceChrome(): void {
     const folder = this.store.snapshot.settings.defaultCwd || '';
     const folderLabel = folder ? workspaceName(folder) : 'No folder selected';
     const total = this.totalPaneCount;
     const running = this.runningPaneCount;
     const assignments = this.store.snapshot.panes.map((pane) => pane.assignment);
-    const universal = launcherDraft.bulkAssignment ?? inferBulkAssignment(assignments) ?? 'shell';
+    const universal = inferBulkAssignment(assignments) ?? 'shell';
     const uniform = assignments.every((assignment) => assignment === assignments[0]);
     const statusText = this.statusTextForWorkspace();
 
@@ -2094,9 +2130,8 @@ class WorkspaceTab implements TabBase {
     this.statusTerminalCountEl.textContent = `${total} terminal${total === 1 ? '' : 's'}`;
     this.statusRunningCountEl.textContent = `${running} running`;
     this.statusAgentEl.textContent = `Universal agent: ${ASSIGNMENT_LABELS[universal]}`;
-    this.statusAutoApproveEl.textContent = 'Auto-approve: Off';
+    this.statusAutoApproveEl.textContent = `Auto Approval: ${approvalSettings.autoApprovalEnabled ? 'On' : 'Off'}`;
     this.statusHealthEl.textContent = statusText;
-    this.approvalCountEl.textContent = '0';
     this.railButtons.workspace.classList.toggle('active', true);
     this.railButtons.agents.classList.toggle('active', false);
     this.railButtons.logs.classList.toggle('active', false);
@@ -2112,29 +2147,7 @@ class WorkspaceTab implements TabBase {
     this.topBarApprovalsEl.title = 'Open the approval queue panel';
     this.topBarSettingsEl.title = 'Open settings';
     this.topBarBackEl.title = 'Return to the launcher';
-    this.approvalListEl.replaceChildren(
-      approvalPlaceholderCard(
-        'Approval Queue',
-        'No queued approvals. This panel stays safe until real approval logic is wired in.',
-      ),
-      approvalPlaceholderCard(
-        'Auto-approve: Off',
-        'Approval actions remain explicit and manual.',
-      ),
-    );
-    this.approvalFooterEl.replaceChildren(
-      document.createElement('span'),
-      document.createElement('button'),
-    );
-    const footerText = this.approvalFooterEl.firstElementChild as HTMLSpanElement | null;
-    const footerButton = this.approvalFooterEl.lastElementChild as HTMLButtonElement | null;
-    if (footerText) footerText.textContent = 'Auto-approve: Off';
-    if (footerButton) {
-      footerButton.type = 'button';
-      footerButton.className = 'workspace-approval-manage';
-      footerButton.textContent = 'Manage Rules';
-      footerButton.disabled = true;
-    }
+    this.renderApprovalQueue();
     this.topBarApprovalsEl.setAttribute('aria-pressed', 'false');
     this.railButtons.workspace.setAttribute('aria-pressed', 'true');
     this.railButtons.agents.setAttribute('aria-pressed', 'false');
@@ -2144,9 +2157,257 @@ class WorkspaceTab implements TabBase {
     this.railButtons.settings.setAttribute('aria-pressed', 'false');
     this.topBarFolderEl.classList.toggle('is-empty', !folder);
     this.statusFolderEl.classList.toggle('is-empty', !folder);
-    this.approvalPanelEl.dataset.state = 'empty';
     this.shellEl.dataset.mode = uniform ? 'uniform' : 'mixed';
     this.shellEl.dataset.status = statusText.toLowerCase();
+  }
+
+  private handleApprovalRequest(evt: TerminalApprovalRequestEvent): void {
+    if (this.approvalItems.some((item) => item.requestId === evt.requestId)) return;
+    const pane = this.store.snapshot.panes.find((item) => item.id === evt.paneId);
+    if (!pane) return;
+
+    const item: ApprovalQueueItem = {
+      ...evt,
+      terminalNumber: pane.layout.index + 1,
+      status: 'pending',
+      enqueuedAt: Date.now(),
+      resolvedAt: null,
+      countdownEndsAt: null,
+    };
+    this.approvalItems.push(item);
+    this.renderApprovalQueue();
+    this.startAutoApprovalCountdown(item);
+  }
+
+  private handleApprovalResolved(evt: ApprovalResolvedEvent): void {
+    const item = this.approvalItems.find((candidate) => candidate.requestId === evt.requestId);
+    if (!item) return;
+    this.stopApprovalCountdown(evt.requestId);
+    item.status = evt.status;
+    item.resolvedAt = evt.resolvedAt;
+    item.countdownEndsAt = null;
+    this.renderApprovalQueue();
+    this.scheduleApprovalRemoval(evt.requestId);
+  }
+
+  private renderApprovalQueue(): void {
+    const pending = this.approvalItems.filter((item) => item.status === 'pending');
+    this.approvalCountEl.textContent = String(pending.length);
+    this.approvalPanelEl.dataset.state = pending.length > 0 ? 'pending' : 'empty';
+
+    if (this.approvalItems.length === 0) {
+      this.approvalListEl.replaceChildren(approvalEmptyState());
+    } else {
+      this.approvalListEl.replaceChildren(...this.approvalItems.map((item) => this.renderApprovalItem(item)));
+    }
+
+    const footerText = document.createElement('span');
+    footerText.className = 'workspace-approval-footer-label';
+    footerText.textContent = 'Auto-approve';
+
+    const toggleLabel = document.createElement('label');
+    toggleLabel.className = 'workspace-approval-toggle';
+    toggleLabel.title = 'Toggle auto-approval of agent requests';
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.className = 'workspace-approval-toggle-input';
+    toggle.checked = approvalSettings.autoApprovalEnabled;
+    toggle.setAttribute('aria-label', 'Toggle auto-approve');
+    const track = document.createElement('span');
+    track.className = 'workspace-approval-toggle-track';
+    toggle.addEventListener('change', () => {
+      void this.setAutoApprovalEnabled(toggle.checked);
+    });
+    toggleLabel.append(toggle, track);
+    this.approvalFooterEl.replaceChildren(footerText, toggleLabel);
+  }
+
+  private renderApprovalItem(item: ApprovalQueueItem): HTMLElement {
+    const card = document.createElement('article');
+    card.className = `workspace-approval-card workspace-approval-item is-${item.status}`;
+
+    // Meta row: terminal number + agent badge
+    const head = document.createElement('div');
+    head.className = 'workspace-approval-item-head';
+    const termLabel = document.createElement('span');
+    termLabel.className = 'workspace-approval-card-title';
+    termLabel.textContent = `Terminal ${item.terminalNumber}`;
+    const dot = document.createElement('span');
+    dot.className = 'workspace-approval-item-dot';
+    dot.setAttribute('aria-hidden', 'true');
+    dot.textContent = '·';
+    const agentBadge = document.createElement('span');
+    agentBadge.className = 'workspace-approval-agent';
+    agentBadge.textContent = item.agentName;
+    head.append(termLabel, dot, agentBadge);
+
+    // Request text
+    const body = document.createElement('div');
+    body.className = 'workspace-approval-card-body';
+    body.textContent = item.prompt || 'Approval requested by terminal session.';
+
+    // Action buttons — Decline (left/secondary) then Approve (right/primary)
+    const actions = document.createElement('div');
+    actions.className = 'workspace-approval-actions';
+    const decline = document.createElement('button');
+    decline.type = 'button';
+    decline.className = 'workspace-approval-action decline';
+    decline.textContent = 'Decline';
+    decline.disabled = item.status !== 'pending';
+    decline.addEventListener('click', () => {
+      void this.resolveApproval(item.requestId, 'decline', 'manual');
+    });
+    const approve = document.createElement('button');
+    approve.type = 'button';
+    approve.className = 'workspace-approval-action approve';
+    approve.textContent = 'Approve';
+    approve.disabled = item.status !== 'pending';
+    approve.addEventListener('click', () => {
+      void this.resolveApproval(item.requestId, 'approve', 'manual');
+    });
+    actions.append(decline, approve);
+
+    // Status / countdown
+    const meta = document.createElement('div');
+    meta.className = 'workspace-approval-meta';
+    const showCountdown =
+      item.status === 'pending' && approvalSettings.autoApprovalEnabled && item.countdownEndsAt !== null;
+    if (showCountdown && item.countdownEndsAt !== null) {
+      const remaining = Math.max(0, item.countdownEndsAt - Date.now());
+      const pct = Math.min(100, (remaining / AUTO_APPROVAL_DELAY_MS) * 100);
+      const countdownWrap = document.createElement('div');
+      countdownWrap.className = 'workspace-approval-countdown';
+      const track = document.createElement('div');
+      track.className = 'workspace-approval-countdown-track';
+      const fill = document.createElement('div');
+      fill.className = 'workspace-approval-countdown-fill';
+      fill.style.width = `${pct.toFixed(1)}%`;
+      track.append(fill);
+      const countdownLabel = document.createElement('div');
+      countdownLabel.className = 'workspace-approval-countdown-label';
+      countdownLabel.textContent = approvalItemStatusText(item);
+      countdownWrap.append(track, countdownLabel);
+      meta.append(countdownWrap);
+    } else {
+      meta.textContent = approvalItemStatusText(item);
+    }
+
+    card.append(head, body, actions, meta);
+    return card;
+  }
+
+  private async setAutoApprovalEnabled(enabled: boolean): Promise<void> {
+    if (enabled && !approvalSettings.suppressAutoApprovalWarning) {
+      const warning = await showAutoApprovalWarning();
+      const suppressAutoApprovalWarning =
+        approvalSettings.suppressAutoApprovalWarning || warning.neverShowAgain;
+      if (!warning.continueEnabled) {
+        await updateApprovalSettings({
+          autoApprovalEnabled: false,
+          suppressAutoApprovalWarning,
+        });
+        this.stopAllAutoApprovalCountdowns();
+        refreshApprovalQueues();
+        return;
+      }
+      await updateApprovalSettings({
+        autoApprovalEnabled: true,
+        suppressAutoApprovalWarning,
+      });
+    } else {
+      await updateApprovalSettings({ autoApprovalEnabled: enabled });
+    }
+
+    if (approvalSettings.autoApprovalEnabled) {
+      this.startPendingAutoApprovalCountdowns();
+    } else {
+      this.stopAllAutoApprovalCountdowns();
+    }
+    refreshApprovalQueues();
+  }
+
+  private startPendingAutoApprovalCountdowns(): void {
+    for (const item of this.approvalItems) {
+      this.startAutoApprovalCountdown(item);
+    }
+  }
+
+  private startAutoApprovalCountdown(item: ApprovalQueueItem): void {
+    if (!approvalSettings.autoApprovalEnabled || item.status !== 'pending') return;
+    if (this.approvalCountdownTimers.has(item.requestId)) return;
+
+    item.countdownEndsAt = Date.now() + AUTO_APPROVAL_DELAY_MS;
+    const tick = (): void => {
+      if (!approvalSettings.autoApprovalEnabled || item.status !== 'pending') {
+        this.stopApprovalCountdown(item.requestId);
+        this.renderApprovalQueue();
+        return;
+      }
+      if (Date.now() >= (item.countdownEndsAt ?? 0)) {
+        this.stopApprovalCountdown(item.requestId);
+        void this.resolveApproval(item.requestId, 'approve', 'auto');
+        return;
+      }
+      this.renderApprovalQueue();
+    };
+    const timer = window.setInterval(tick, 250);
+    this.approvalCountdownTimers.set(item.requestId, timer);
+    this.renderApprovalQueue();
+  }
+
+  private stopApprovalCountdown(requestId: string): void {
+    const timer = this.approvalCountdownTimers.get(requestId);
+    if (timer !== undefined) {
+      window.clearInterval(timer);
+      this.approvalCountdownTimers.delete(requestId);
+    }
+    const item = this.approvalItems.find((candidate) => candidate.requestId === requestId);
+    if (item) item.countdownEndsAt = null;
+  }
+
+  private stopAllAutoApprovalCountdowns(): void {
+    for (const requestId of this.approvalCountdownTimers.keys()) {
+      this.stopApprovalCountdown(requestId);
+    }
+  }
+
+  private async resolveApproval(
+    requestId: string,
+    action: ApprovalAction,
+    mode: ApprovalResolveMode,
+  ): Promise<void> {
+    const item = this.approvalItems.find((candidate) => candidate.requestId === requestId);
+    if (!item || item.status !== 'pending') return;
+    this.stopApprovalCountdown(requestId);
+    item.status = mode === 'auto' ? 'auto-approved' : action === 'approve' ? 'approved' : 'declined';
+    item.resolvedAt = Date.now();
+    this.renderApprovalQueue();
+
+    const result = await window.agentgridPty.resolveApproval({
+      requestId: item.requestId,
+      ptyId: item.ptyId,
+      action,
+      mode,
+    });
+    if (!result.ok) {
+      item.status = 'dismissed';
+      item.resolvedAt = Date.now();
+    }
+    this.renderApprovalQueue();
+    this.scheduleApprovalRemoval(requestId);
+  }
+
+  private scheduleApprovalRemoval(requestId: string): void {
+    if (this.approvalRemovalTimers.has(requestId)) return;
+    const timer = window.setTimeout(() => {
+      this.approvalRemovalTimers.delete(requestId);
+      const index = this.approvalItems.findIndex((item) => item.requestId === requestId);
+      if (index !== -1) {
+        this.approvalItems.splice(index, 1);
+        this.renderApprovalQueue();
+      }
+    }, 1200);
+    this.approvalRemovalTimers.set(requestId, timer);
   }
 
   private statusTextForWorkspace(): string {
@@ -2376,6 +2637,15 @@ class WorkspaceTab implements TabBase {
 
     this.panelEl.classList.add('is-closing');
     this.browser.destroy();
+    this.approvalRequestOff?.();
+    this.approvalResolvedOff?.();
+    this.approvalRequestOff = null;
+    this.approvalResolvedOff = null;
+    this.stopAllAutoApprovalCountdowns();
+    for (const timer of this.approvalRemovalTimers.values()) {
+      window.clearTimeout(timer);
+    }
+    this.approvalRemovalTimers.clear();
 
     const snapshot = Array.from(this.controllers.values());
     this.controllers.clear();
@@ -2402,6 +2672,15 @@ class WorkspaceTab implements TabBase {
   /** Shutdown variant â€” main process owns PTY teardown during quit. */
   disposeForShutdown(): void {
     this.browser.destroy();
+    this.approvalRequestOff?.();
+    this.approvalResolvedOff?.();
+    this.approvalRequestOff = null;
+    this.approvalResolvedOff = null;
+    this.stopAllAutoApprovalCountdowns();
+    for (const timer of this.approvalRemovalTimers.values()) {
+      window.clearTimeout(timer);
+    }
+    this.approvalRemovalTimers.clear();
     for (const c of this.controllers.values()) {
       try {
         c.disposeForShutdown();
@@ -2678,7 +2957,7 @@ const launcherDraft: LauncherDraft = {
   bulkAssignment: 'shell',
 };
 
-let wizardStep: 1 | 2 | 3 = 1;
+let setupStep: 1 | 2 = 1;
 
 let appState: PersistedAppState = cloneAppState(DEFAULT_APP_STATE);
 let terminalSettings: TerminalSettings = {
@@ -2686,6 +2965,10 @@ let terminalSettings: TerminalSettings = {
   fontFamily: DEFAULT_FONT_FAMILY,
   copyOnSelect: false,
   pasteConfirmForLargeText: true,
+};
+let approvalSettings: ApprovalSettings = {
+  autoApprovalEnabled: false,
+  suppressAutoApprovalWarning: false,
 };
 
 function ensureAssignmentsLength(draft: LauncherDraft): void {
@@ -2728,6 +3011,10 @@ function applyLoadedAppState(state: PersistedAppState): void {
     copyOnSelect: state.terminalSettings.copyOnSelect,
     pasteConfirmForLargeText: state.terminalSettings.pasteConfirmForLargeText,
   };
+  approvalSettings = {
+    autoApprovalEnabled: state.approvalSettings.autoApprovalEnabled,
+    suppressAutoApprovalWarning: state.approvalSettings.suppressAutoApprovalWarning,
+  };
 }
 
 async function patchAppState(patch: AppStatePatch): Promise<void> {
@@ -2742,6 +3029,9 @@ async function patchAppState(patch: AppStatePatch): Promise<void> {
       terminalSettings: patch.terminalSettings
         ? { ...appState.terminalSettings, ...patch.terminalSettings }
         : appState.terminalSettings,
+      approvalSettings: patch.approvalSettings
+        ? { ...appState.approvalSettings, ...patch.approvalSettings }
+        : appState.approvalSettings,
       presets: patch.presets !== undefined ? patch.presets : appState.presets,
       updatedAt: Date.now(),
     };
@@ -2749,9 +3039,102 @@ async function patchAppState(patch: AppStatePatch): Promise<void> {
   }
   try {
     appState = await bridge.patch(patch);
+    if (patch.approvalSettings) {
+      approvalSettings = { ...appState.approvalSettings };
+    }
+    if (patch.terminalSettings) {
+      terminalSettings = { ...appState.terminalSettings };
+    }
   } catch (err) {
     console.warn('[app-state] patch failed', err);
   }
+}
+
+async function updateApprovalSettings(patch: Partial<ApprovalSettings>): Promise<void> {
+  approvalSettings = { ...approvalSettings, ...patch };
+  await patchAppState({ approvalSettings });
+  refreshApprovalQueues();
+}
+
+function refreshApprovalQueues(): void {
+  if (typeof tabManager === 'undefined') return;
+  for (const workspace of tabManager.workspaceTabs) {
+    workspace.refreshApprovalQueue();
+  }
+}
+
+function approvalItemStatusText(item: ApprovalQueueItem): string {
+  if (item.status === 'pending' && approvalSettings.autoApprovalEnabled && item.countdownEndsAt) {
+    const remainingMs = Math.max(0, item.countdownEndsAt - Date.now());
+    const s = Math.ceil(remainingMs / 1000);
+    return `Auto-approving in ${s}s…`;
+  }
+  if (item.status === 'pending') return 'Waiting for review';
+  if (item.status === 'approved') return 'Approved';
+  if (item.status === 'declined') return 'Declined';
+  if (item.status === 'auto-approved') return 'Auto-approved';
+  return 'Dismissed';
+}
+
+function showAutoApprovalWarning(): Promise<{ continueEnabled: boolean; neverShowAgain: boolean }> {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.className = 'approval-warning-overlay';
+    overlay.setAttribute('role', 'presentation');
+
+    const modal = document.createElement('section');
+    modal.className = 'approval-warning-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-labelledby', 'approval-warning-title');
+
+    const title = document.createElement('h2');
+    title.id = 'approval-warning-title';
+    title.className = 'approval-warning-title';
+    title.textContent = 'Enable Auto-Approval?';
+
+    const copy = document.createElement('p');
+    copy.className = 'approval-warning-body';
+    copy.textContent =
+      'Auto-approving CLI agent requests runs commands without your review. Dangerous or unexpected commands may execute automatically.';
+
+    const neverLabel = document.createElement('label');
+    neverLabel.className = 'approval-warning-checkbox';
+    const never = document.createElement('input');
+    never.type = 'checkbox';
+    never.className = 'approval-warning-never-input';
+    const neverText = document.createElement('span');
+    neverText.textContent = "Don't show this warning again";
+    neverLabel.append(never, neverText);
+
+    const actions = document.createElement('div');
+    actions.className = 'approval-warning-actions';
+    const back = document.createElement('button');
+    back.type = 'button';
+    back.className = 'approval-warning-button secondary';
+    back.textContent = 'No, go back';
+    const proceed = document.createElement('button');
+    proceed.type = 'button';
+    proceed.className = 'approval-warning-button primary';
+    proceed.textContent = 'Continue';
+    actions.append(back, proceed);
+
+    const close = (continueEnabled: boolean): void => {
+      const neverShowAgain = never.checked;
+      overlay.remove();
+      resolve({ continueEnabled, neverShowAgain });
+    };
+    back.addEventListener('click', () => close(false));
+    proceed.addEventListener('click', () => close(true));
+    overlay.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') close(false);
+    });
+
+    modal.append(title, copy, neverLabel, actions);
+    overlay.append(modal);
+    document.body.append(overlay);
+    window.setTimeout(() => back.focus(), 0);
+  });
 }
 
 async function persistLauncherDefaults(): Promise<void> {
@@ -2925,7 +3308,6 @@ function summarizeCliHealth(): { text: string; tone: 'checking' | 'ready' | 'war
   };
 }
 
-function updateLauncherSystemStatus(): void {}
 
 function renderCliHealth(): void {
   const summary = summarizeCliHealth();
@@ -2966,7 +3348,6 @@ function renderCliHealth(): void {
     cliHealthListEl!.append(row);
   }
 
-  updateLauncherSystemStatus();
   if (agentMondayState.route && agentMondayState.task.trim()) {
     agentMondayState.route = buildAgentMondayRoutingRequest();
   }
@@ -3334,14 +3715,16 @@ function updateHeaderStatus(): void {
   if (active.kind === 'home') {
     const wsCount = tabManager.workspaceTabs.length;
     if (statusEl) statusEl.hidden = true;
+    if (headerLaunchBtnEl) headerLaunchBtnEl.hidden = setupStep !== 2;
     setStatus(
       wsCount === 0
         ? 'Ready'
         : `Home | ${wsCount} workspace${wsCount === 1 ? '' : 's'} open`,
     );
-    paneCountEl!.hidden = true;
+    if (paneCountEl) paneCountEl.hidden = true;
     return;
   }
+  if (headerLaunchBtnEl) headerLaunchBtnEl.hidden = true;
   const ws = active as WorkspaceTab;
   if (statusEl) statusEl.hidden = false;
   const total = ws.totalPaneCount;
@@ -3350,12 +3733,13 @@ function updateHeaderStatus(): void {
   const parts = [`${total} terminal${total === 1 ? '' : 's'}`, `${running} running`];
   if (errors > 0) parts.push(`${errors} failed`);
   setStatus(parts.join(' | '));
-  paneCountEl!.hidden = false;
+  if (paneCountEl) paneCountEl.hidden = false;
   renderWorkspaceAddControl(ws);
 }
 
 function renderWorkspaceAddControl(ws: WorkspaceTab): void {
-  paneCountEl!.replaceChildren();
+  if (!paneCountEl) return;
+  paneCountEl.replaceChildren();
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'workspace-add-pane-button';
@@ -3372,7 +3756,7 @@ function renderWorkspaceAddControl(ws: WorkspaceTab): void {
     tabManager.refreshIndicators();
   });
   enableButtonMotion(button);
-  paneCountEl!.append(button);
+  paneCountEl.append(button);
 }
 
 // Single notification point for "something workspace-shaped changed" â€” tab
@@ -3409,6 +3793,16 @@ function renderProjectFolder(): void {
       headerProjectFolderEl.title = '';
     }
   }
+  // Gate Next and Launch on folder presence
+  const hasFolder = !!folder;
+  if (setupNextBtnEl) {
+    setupNextBtnEl.disabled = !hasFolder;
+    setupNextBtnEl.title = hasFolder ? '' : 'Select a folder first';
+  }
+  if (setupLaunchBtnEl) {
+    setupLaunchBtnEl.disabled = !hasFolder;
+    setupLaunchBtnEl.title = hasFolder ? '' : 'Select a folder first';
+  }
   renderAgentMondayPanel();
 }
 
@@ -3444,7 +3838,6 @@ projectFolderBrowseEl.addEventListener('click', () => {
       launcherDraft.projectFolder = result.path;
       resetAgentMondayRouteForLauncherChange('Project folder changed. Plan agents again to refresh the route preview.');
       renderProjectFolder();
-      renderWizardFolderDisplay();
       renderLaunchSummary();
       void persistLauncherDefaults().then(() => renderSettings());
       showProjectFolderNotice('Selected folder will be used as the working directory.');
@@ -3544,68 +3937,92 @@ function renderLauncherBulkAgent(): void {
   launcherBulkAgentEl!.append(wrap);
 }
 
+function renderWizardUniversalAgent(): void {
+  if (!wizardUniversalAgentEl) return;
+  wizardUniversalAgentEl.replaceChildren();
+
+  const activeAssignments = launcherDraft.assignments.slice(0, launcherDraft.paneCount);
+  const allSame = activeAssignments.length > 0 && activeAssignments.every((a) => a === activeAssignments[0]);
+  const isMixed = !allSame && activeAssignments.length > 1;
+
+  const label = document.createElement('span');
+  label.className = 'wizard-universal-label';
+  label.textContent = 'Apply to all';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'wizard-universal-wrap';
+
+  const select = document.createElement('select');
+  select.className = 'wizard-universal-select';
+  select.setAttribute('aria-label', 'Apply same agent to all terminals');
+
+  if (isMixed) {
+    const mixedOpt = document.createElement('option');
+    mixedOpt.value = '';
+    mixedOpt.textContent = '— Mixed —';
+    select.append(mixedOpt);
+  }
+
+  for (const assignment of ALL_ASSIGNMENTS) {
+    const option = document.createElement('option');
+    option.value = assignment;
+    option.textContent = ASSIGNMENT_LABELS[assignment];
+    select.append(option);
+  }
+
+  select.value = isMixed ? '' : (activeAssignments[0] ?? 'shell');
+
+  select.addEventListener('change', () => {
+    const value = select.value as PaneAssignment;
+    if (!value) return;
+    launcherDraft.bulkAssignment = value;
+    launcherDraft.assignments = Array.from({ length: launcherDraft.paneCount }, () => value);
+    resetAgentMondayRouteForLauncherChange('Pane tools changed. Plan agents again to refresh the route preview.');
+    renderLauncherAssignments();
+    renderLaunchSummary();
+    void persistLauncherDefaults();
+  });
+
+  wrap.append(select);
+  wizardUniversalAgentEl.append(label, wrap);
+}
+
 function renderLauncherAssignments(): void {
   launcherAssignmentsEl!.replaceChildren();
-  for (let i = 0; i < launcherDraft.paneCount; i++) {
-    const card = document.createElement('div');
-    card.className = 'assignment-card';
-    enableCardMotion(card);
+  const g = WIZARD_TILE_GRIDS[launcherDraft.paneCount] ?? { cols: 2, rows: Math.ceil(launcherDraft.paneCount / 2) };
+  launcherAssignmentsEl!.style.gridTemplateColumns = `repeat(${g.cols}, 1fr)`;
 
-    const header = document.createElement('div');
-    header.className = 'assignment-card-header';
+  for (let i = 0; i < launcherDraft.paneCount; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'assign-cell';
 
     const label = document.createElement('div');
-    label.className = 'assignment-card-label';
+    label.className = 'assign-cell-label';
     label.textContent = `Terminal ${i + 1}`;
 
-    const badge = document.createElement('span');
-    const initial = launcherAssignmentStatus(launcherDraft.assignments[i]);
-    badge.className = `assignment-card-badge ${initial.className}`;
-    badge.textContent = initial.label;
-    header.append(label, badge);
-
     const select = document.createElement('select');
-    select.className = 'assignment-card-select styled-select';
+    select.className = 'assign-cell-select';
     select.setAttribute('aria-label', `Terminal ${i + 1}: agent`);
     for (const assignment of ALL_ASSIGNMENTS) {
       const option = document.createElement('option');
       option.value = assignment;
       option.textContent = ASSIGNMENT_LABELS[assignment];
-      if (assignment === launcherDraft.assignments[i]) option.selected = true;
+      if (assignment === (launcherDraft.assignments[i] ?? 'shell')) option.selected = true;
       select.append(option);
     }
 
-    const description = document.createElement('div');
-    description.className = 'assignment-card-description';
-    description.textContent = launcherAssignmentDescription(launcherDraft.assignments[i]);
-
-    const actions = document.createElement('div');
-    actions.className = 'assignment-card-actions';
-    const hint = document.createElement('div');
-    hint.className = 'assignment-card-hint';
-    hint.textContent = launcherDraft.bulkAssignment
-      ? `Default agent: ${ASSIGNMENT_LABELS[launcherDraft.bulkAssignment]}`
-      : 'Custom terminal override';
-    actions.append(hint);
-
     select.addEventListener('change', () => {
       launcherDraft.assignments[i] = select.value as PaneAssignment;
-      const next = launcherDraft.assignments[i];
-      const status = launcherAssignmentStatus(next);
-      badge.className = `assignment-card-badge ${status.className}`;
-      badge.textContent = status.label;
-      description.textContent = launcherAssignmentDescription(next);
-      resetAgentMondayRouteForLauncherChange('Pane tools changed. Plan agents again to refresh the route preview.');
-      renderLauncherBulkAgent();
-      renderAgentMondayPanel();
+      renderWizardUniversalAgent();
       renderLaunchSummary();
       void persistLauncherDefaults();
     });
 
-    card.append(header, select, description, actions);
-    launcherAssignmentsEl!.append(card);
-    void fadeIn(card, { y: MOTION_Y_SM, duration: ENTRANCE_DURATION_S, delay: i * 0.05 });
+    cell.append(label, select);
+    launcherAssignmentsEl!.append(cell);
+    void fadeIn(cell, { y: MOTION_Y_SM, duration: ENTRANCE_DURATION_S, delay: i * 0.04 });
   }
+  renderWizardUniversalAgent();
 }
 
 function renderOpenWorkspaces(): void {
@@ -3853,7 +4270,10 @@ function renderSettings(): void {
   }
 }
 
+let settingsOpener: HTMLElement | null = null;
+
 function openSettingsPanel(): void {
+  settingsOpener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   renderSettings();
   tabManager.setBrowserPreviewsSuppressed(true);
   settingsPanelEl!.hidden = false;
@@ -3866,7 +4286,8 @@ function closeSettingsPanel(): void {
   settingsPanelEl!.hidden = true;
   tabManager.setBrowserPreviewsSuppressed(false);
   settingsButtonEl!.setAttribute('aria-expanded', 'false');
-  settingsButtonEl!.focus();
+  (settingsOpener ?? settingsButtonEl)?.focus();
+  settingsOpener = null;
 }
 
 function readSettingsForm(): TerminalSettings {
@@ -3910,6 +4331,12 @@ function renderLaunchSummary(): void {
     summaryLaunchBtnEl.disabled = !window.agentgridPty;
     summaryLaunchBtnEl.title = summaryLaunchBtnEl.disabled ? 'Terminal bridge unavailable' : 'Launch the selected workspace';
   }
+  if (headerLaunchBtnEl) {
+    const noPty = !window.agentgridPty;
+    const noFolder = !launcherDraft.projectFolder;
+    headerLaunchBtnEl.disabled = noPty || noFolder;
+    headerLaunchBtnEl.title = noPty ? 'Terminal bridge unavailable' : noFolder ? 'Select a folder first' : 'Start a new workspace';
+  }
 }
 
 const WIZARD_TILE_COUNTS = [1, 2, 4, 6, 8, 10, 12] as const;
@@ -3952,7 +4379,8 @@ function renderWizardTiles(): void {
       d.className = 'wizard-tile-dot';
       dots.append(d);
     }
-    dots.style.gridTemplateColumns = `repeat(${g.cols}, 1fr)`;
+    dots.style.gridTemplateColumns = `repeat(${g.cols}, 5px)`;
+    dots.style.gridTemplateRows = `repeat(${g.rows}, 5px)`;
 
     const label = document.createElement('span');
     label.className = 'wizard-tile-label';
@@ -3972,73 +4400,6 @@ function renderWizardBadge(): void {
   wizardTerminalsBadgeEl.textContent = `${n} terminal${n === 1 ? '' : 's'} · ${grid} grid`;
 }
 
-function renderWizardFolderDisplay(): void {
-  if (!wizardFolderPathEl) return;
-  const folder = launcherDraft.projectFolder;
-  wizardFolderPathEl.textContent = folder ? workspaceName(folder) : 'No folder selected';
-  wizardFolderPathEl.title = folder ?? '';
-}
-
-function renderWizardStepper(): void {
-  for (let s = 1; s <= 3; s++) {
-    const circleEl = document.getElementById(`ws-circle-${s}`);
-    const itemEl = document.getElementById(`ws-item-${s}`);
-    if (!circleEl || !itemEl) continue;
-    itemEl.classList.remove('active', 'completed');
-    if (s < wizardStep) {
-      itemEl.classList.add('completed');
-      circleEl.textContent = '✓';
-    } else if (s === wizardStep) {
-      itemEl.classList.add('active');
-      circleEl.textContent = String(s);
-    } else {
-      circleEl.textContent = String(s);
-    }
-  }
-  for (let l = 1; l <= 2; l++) {
-    const lineEl = document.getElementById(`ws-line-${l}`);
-    if (!lineEl) continue;
-    lineEl.classList.toggle('completed', l < wizardStep);
-  }
-}
-
-function renderWizardFooter(): void {
-  if (!wizardBackBtnEl || !wizardNextBtnEl || !wizardOpenPlainBtnEl) return;
-  wizardBackBtnEl.hidden = wizardStep === 1;
-  wizardOpenPlainBtnEl.hidden = wizardStep !== 2;
-  if (wizardStep === 1) {
-    wizardNextBtnEl.textContent = 'Next: Choose layout →';
-    wizardNextBtnEl.hidden = false;
-  } else if (wizardStep === 2) {
-    wizardNextBtnEl.textContent = 'Next: Add AI agents →';
-    wizardNextBtnEl.hidden = false;
-  } else {
-    wizardNextBtnEl.textContent = 'Launch Workspace';
-    wizardNextBtnEl.hidden = false;
-  }
-}
-
-function renderWizardPanes(): void {
-  if (wizardPane1El) wizardPane1El.hidden = wizardStep !== 1;
-  if (wizardPane2El) wizardPane2El.hidden = wizardStep !== 2;
-  if (wizardPane3El) wizardPane3El.hidden = wizardStep !== 3;
-}
-
-function goToWizardStep(step: 1 | 2 | 3): void {
-  wizardStep = step;
-  renderWizardStepper();
-  renderWizardPanes();
-  renderWizardFooter();
-  if (step === 2) {
-    renderWizardFolderDisplay();
-    renderWizardTiles();
-    renderLauncherBulkAgent();
-  }
-  if (step === 3) {
-    renderLauncherAssignments();
-  }
-}
-
 function renderLauncher(): void {
   ensureAssignmentsLength(launcherDraft);
   renderProjectFolder();
@@ -4050,20 +4411,12 @@ function renderLauncher(): void {
   renderSettings();
   renderAgentMondayPanel();
   renderLaunchSummary();
-  renderWizardStepper();
-  renderWizardPanes();
-  renderWizardFooter();
   renderWizardTiles();
-  renderWizardFolderDisplay();
   updateHeaderStatus();
 }
 
 /** Chrome entrance when the workspace shell becomes visible. */
 function runHomeChromeEntranceAnimations(): void {
-  const header = document.querySelector('.app-header');
-  if (header instanceof HTMLElement) {
-    void fadeIn(header, { y: -MOTION_Y_XS, duration: ENTRANCE_DURATION_S });
-  }
   void fadeIn(homePanelEl!, { y: MOTION_Y_MD, duration: 0.28, delay: 0.05 });
   const panel = document.querySelector('.launcher-panel');
   if (panel instanceof HTMLElement) {
@@ -4103,6 +4456,17 @@ const tabManager = new TabManager(homeTab);
 
 sidebarHomeBtnEl.addEventListener('click', () => {
   tabManager.switchTo(tabManager.homeId);
+});
+
+sidebarToggleBtnEl?.addEventListener('click', () => {
+  const isCollapsed = mainAppEl!.dataset.sidebar === 'collapsed';
+  const next = isCollapsed ? 'expanded' : 'collapsed';
+  mainAppEl!.dataset.sidebar = next;
+  appSidebarEl?.setAttribute('aria-expanded', isCollapsed ? 'true' : 'false');
+  if (sidebarToggleBtnEl) {
+    sidebarToggleBtnEl.title = isCollapsed ? 'Collapse sidebar' : 'Expand sidebar';
+    sidebarToggleBtnEl.ariaLabel = isCollapsed ? 'Collapse sidebar' : 'Expand sidebar';
+  }
 });
 
 settingsButtonEl.addEventListener('click', () => {
@@ -4197,26 +4561,37 @@ installInstructionsDialogEl?.addEventListener('click', (e) => {
   });
 });
 
-wizardBackBtnEl?.addEventListener('click', () => {
-  goToWizardStep((wizardStep - 1) as 1 | 2 | 3);
-});
+function goToSetupStep(step: 1 | 2): void {
+  setupStep = step;
+  if (setupPane1El) setupPane1El.hidden = step !== 1;
+  if (setupPane2El) setupPane2El.hidden = step !== 2;
+  if (headerLaunchBtnEl) headerLaunchBtnEl.hidden = step !== 2;
 
-wizardNextBtnEl?.addEventListener('click', () => {
-  if (wizardStep === 3) {
-    doLaunchWorkspace();
-  } else {
-    goToWizardStep((wizardStep + 1) as 2 | 3);
+  // Update stepper
+  ssItem1El?.classList.toggle('active', step === 1);
+  ssItem1El?.classList.toggle('completed', step > 1);
+  if (ssCircle1El) ssCircle1El.textContent = step > 1 ? '✓' : '1';
+  ssItem2El?.classList.toggle('active', step === 2);
+  ssLine1El?.classList.toggle('completed', step > 1);
+
+  if (step === 2) {
+    launcherDraft.assignments = Array.from({ length: launcherDraft.paneCount }, (_, i) =>
+      launcherDraft.assignments[i] ?? 'shell'
+    );
+    launcherDraft.bulkAssignment = inferBulkAssignment(launcherDraft.assignments) ?? launcherDraft.bulkAssignment ?? 'shell';
+    renderLauncherAssignments();
   }
-});
 
-wizardOpenPlainBtnEl?.addEventListener('click', () => {
-  launcherDraft.assignments = Array.from({ length: launcherDraft.paneCount }, () => 'shell' as PaneAssignment);
-  launcherDraft.bulkAssignment = 'shell';
+  const homePanel = document.getElementById('home-panel');
+  homePanel?.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+setupNextBtnEl?.addEventListener('click', () => goToSetupStep(2));
+setupBackBtnEl?.addEventListener('click', () => goToSetupStep(1));
+setupLaunchBtnEl?.addEventListener('click', () => doLaunchWorkspace());
+
+headerLaunchBtnEl?.addEventListener('click', () => {
   doLaunchWorkspace();
-});
-
-wizardFolderChangeBtnEl?.addEventListener('click', () => {
-  projectFolderBrowseEl?.click();
 });
 
 wizardSavePresetBtnEl?.addEventListener('click', () => {
@@ -4226,6 +4601,11 @@ wizardSavePresetBtnEl?.addEventListener('click', () => {
 
 function doLaunchWorkspace(): void {
   if (!window.agentgridPty) return;
+  if (!launcherDraft.projectFolder) {
+    goToSetupStep(1);
+    showProjectFolderNotice('Select a project folder before launching.');
+    return;
+  }
   ensureAssignmentsLength(launcherDraft);
   void (async () => {
     await tabManager.openWorkspaceTab({
@@ -4234,6 +4614,7 @@ function doLaunchWorkspace(): void {
       cwd: launcherDraft.projectFolder,
     });
     await recordWorkspaceLaunch();
+    goToSetupStep(1);
   })().catch((err) => {
     console.warn('[launcher] launch failed', err);
   });
@@ -4245,8 +4626,28 @@ summaryLaunchBtnEl?.addEventListener('click', () => {
 });
 
 
+// Settings focus trap
+settingsPanelEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { closeSettingsPanel(); return; }
+  if (e.key !== 'Tab') return;
+  const focusable = Array.from(
+    settingsPanelEl!.querySelectorAll<HTMLElement>('button, input, select, textarea, [tabindex]:not([tabindex="-1"])')
+  ).filter((el) => !el.hasAttribute('disabled'));
+  if (focusable.length === 0) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+});
+
 // Ctrl/Cmd+W closes the active workspace tab; never closes Home.
 document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !settingsPanelEl!.hidden) { closeSettingsPanel(); return; }
   const isMod = e.ctrlKey || e.metaKey;
   if (!isMod) return;
   const key = e.key.toLowerCase();
@@ -4255,7 +4656,7 @@ document.addEventListener('keydown', (e) => {
     tabManager.closeActiveWorkspace();
   } else if (key === 'n') {
     e.preventDefault();
-    summaryLaunchBtnEl?.click();
+    doLaunchWorkspace();
   } else if (key === 'tab') {
     e.preventDefault();
     tabManager.switchByOffset(e.shiftKey ? -1 : 1);
@@ -4304,5 +4705,3 @@ void (async () => {
   }
   runHomeChromeEntranceAnimations();
 })();
-
-

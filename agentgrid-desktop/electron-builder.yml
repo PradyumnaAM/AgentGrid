@@ -1,0 +1,54 @@
+appId: com.agentgrid.desktop
+productName: AgentGrid
+asar: true
+asarUnpack:
+  - node_modules/node-pty/**
+
+files:
+  - dist/**
+  - build/icon.ico
+  - build/icon.png
+  - package.json
+
+extraMetadata:
+  main: dist/main/main.js
+
+win:
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: AgentGrid-${version}-Windows-${arch}.${ext}
+  verifyUpdateCodeSignature: false
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  deleteAppDataOnUninstall: false
+
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  artifactName: AgentGrid-${version}-macOS-${arch}.${ext}
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+
+linux:
+  icon: build/icon.png
+  target:
+    - target: AppImage
+      arch:
+        - x64
+  artifactName: AgentGrid-${version}-Linux-${arch}.${ext}
+  category: Development
+
+# publish:
+#   provider: generic
+#   url: ${env.AGENTGRID_RELEASE_BASE_URL}
